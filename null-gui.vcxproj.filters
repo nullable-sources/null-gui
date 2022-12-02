@@ -4,5 +4,144 @@
     <Filter Include="src">
       <UniqueIdentifier>{d11addc5-089b-4237-a3dd-c21f8f81dcf1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\widgets">
+      <UniqueIdentifier>{d6d3be9b-b5f2-4e4a-9d3a-f19efc5202cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\button">
+      <UniqueIdentifier>{b7f587c3-72e0-48a0-b352-52cf33d5e02a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\checkbox">
+      <UniqueIdentifier>{b64a8745-e6a5-4dd2-aa50-eb352c299c87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\clickable-text">
+      <UniqueIdentifier>{333e8c44-8a6a-43c0-b90e-038208d64ccd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\colorpicker">
+      <UniqueIdentifier>{534ceea2-61bf-4f81-b97f-2e2bc4f4d74a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\column">
+      <UniqueIdentifier>{2a107e20-ca7c-4933-b507-f36b66484cbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\combo">
+      <UniqueIdentifier>{5b9d1fad-c5a4-43e2-83f0-f16b05d47919}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\group">
+      <UniqueIdentifier>{c87f6d33-b253-47dd-b3f0-bec1d7578190}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\multicombo">
+      <UniqueIdentifier>{65d09902-cd25-4c60-ab91-b6443d679e62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\scrollbar">
+      <UniqueIdentifier>{b0dd7c3f-06cd-4cb3-a5f1-4beac04b17bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\selectable">
+      <UniqueIdentifier>{80b6cca4-a7d0-4cb3-ad48-eecbd233d367}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\slider">
+      <UniqueIdentifier>{2317329b-0724-424c-8476-2f322bfcfac9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\text">
+      <UniqueIdentifier>{901dfdb7-7623-4bec-ac23-631ebb346f74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\text-input">
+      <UniqueIdentifier>{0089780b-245e-4f08-9d2c-ccbc82d9f187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widgets\window">
+      <UniqueIdentifier>{95bcad03-95c1-4bdd-aa34-a260c655aed1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\null-gui.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\button\button.cpp">
+      <Filter>src\widgets\button</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\checkbox\checkbox.cpp">
+      <Filter>src\widgets\checkbox</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\clickable-text\clickable-text.cpp">
+      <Filter>src\widgets\clickable-text</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\colorpicker\colorpicker.cpp">
+      <Filter>src\widgets\colorpicker</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\column\column.cpp">
+      <Filter>src\widgets\column</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\combo\combo.cpp">
+      <Filter>src\widgets\combo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\group\group.cpp">
+      <Filter>src\widgets\group</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\multicombo\multicombo.cpp">
+      <Filter>src\widgets\multicombo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\scrollbar\scrollbar.cpp">
+      <Filter>src\widgets\scrollbar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\selectable\selectable.cpp">
+      <Filter>src\widgets\selectable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\slider\slider.cpp">
+      <Filter>src\widgets\slider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\text\text.cpp">
+      <Filter>src\widgets\text</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\text-input\text-input.cpp">
+      <Filter>src\widgets\text-input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\widgets\window\window.cpp">
+      <Filter>src\widgets\window</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\null-gui.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\button\button.h">
+      <Filter>src\widgets\button</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\checkbox\checkbox.h">
+      <Filter>src\widgets\checkbox</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\clickable-text\clickable-text.h">
+      <Filter>src\widgets\clickable-text</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\colorpicker\colorpicker.h">
+      <Filter>src\widgets\colorpicker</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\column\column.h">
+      <Filter>src\widgets\column</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\combo\combo.h">
+      <Filter>src\widgets\combo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\group\group.h">
+      <Filter>src\widgets\group</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\multicombo\multicombo.h">
+      <Filter>src\widgets\multicombo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\scrollbar\scrollbar.h">
+      <Filter>src\widgets\scrollbar</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\selectable\selectable.h">
+      <Filter>src\widgets\selectable</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\slider\slider.h">
+      <Filter>src\widgets\slider</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\text\text.h">
+      <Filter>src\widgets\text</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\text-input\text-input.h">
+      <Filter>src\widgets\text-input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\widgets\window\window.h">
+      <Filter>src\widgets\window</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
