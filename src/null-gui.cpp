@@ -1,71 +1,78 @@
 #include <null-gui.h>
 
 namespace null::gui {
-	namespace impl {
-		std::string_view format_widget_name(std::string_view name) {
-			if(auto finded{ std::ranges::search(name, std::string_view{ "##" }) }; !finded.empty())
-				return name.substr(0, std::distance(name.begin(), finded.begin()));
-			return name;
-		}
-	}
-
-	void begin_frame() {
-		if(c_window::hovered && !rect_t{ c_window::hovered->pos, c_window::hovered->pos + c_window::hovered->size }.contains(input::mouse.pos))
-			c_window::hovered = nullptr;
-
-		impl::hovered_widget.clear();
-		impl::last_widget.clear();
-		c_window::windows_handle();
-
-		std::ranges::for_each(c_window::windows, [](const std::shared_ptr<c_window>& window) { window->draw_list->reset(); });
-	}
-
-	void end_frame() {
-		std::ranges::for_each(c_window::windows, [](const std::shared_ptr<c_window>& window) { render::fast_lists.push_back(window->draw_list.get()); });
-	}
-
-	void tooltip(const std::function<void()>& func) {
-		if(c_window::active || !impl::active_widget.empty() || !c_window::current->can_open_tooltip()) return;
-		bool close{ impl::hovered_widget == impl::last_widget };
-		impl::push_var(&style::window::padding, vec2_t{ 5.f }); {
-			if(begin_window("##tooltip", input::mouse.pos + 10.f, 0.f, e_window_flags{ -e_window_flags::no_move | -e_window_flags::no_title_bar | -e_window_flags::popup | -e_window_flags::set_pos | -e_window_flags::auto_size }, &close)) {
-				c_window::current->focus();
-				func();
-				end_window();
-			}
-		} impl::pop_var();
-	}
-
-	void new_line() {
-		c_window::current->add_widget("", vec2_t(0.f, style::new_line_size));
-	}
-
-	void same_line() {
-		c_window::current->autopositioning.current_pos = c_window::current->autopositioning.prev_pos + vec2_t(style::window::item_spacing, 0.f);
-		c_window::current->in_same_line = true;
-	}
-
+	//@credits: https://github.com/KN4CK3R/OSHGui
 	int wnd_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
-		switch(msg) {
-			case WM_CHAR: {
-				if(impl::c_text_input * text_input{ impl::c_text_input::find(impl::active_widget) })
-					text_input->add_char(w_param);
-			} break;
+		e_widget_event widget_msg{ };
+
+		switch(msg) { //@note: transform WM message in e_widget_msg
+			case WM_MOUSEMOVE:
+				widget_msg = e_widget_event::mouse_move;
+				break;
+			
+			case WM_LBUTTONDOWN:
+			case WM_RBUTTONDOWN:
+				widget_msg = e_widget_event::mouse_key_down;
+				break;
+
+			case WM_LBUTTONUP:
+			case WM_RBUTTONUP:
+				widget_msg = e_widget_event::mouse_key_up;
+				break;
+
+			case WM_MOUSEWHEEL:
+				widget_msg = e_widget_event::mouse_wheel;
+				break;
 
 			case WM_SYSKEYDOWN:
-			case WM_KEYDOWN: {
-				if(impl::c_text_input* text_input{ impl::c_text_input::find(impl::active_widget) })
-					text_input->key_down((input::e_key_id)w_param);
-			} break;
+			case WM_KEYDOWN:
+				widget_msg = e_widget_event::key_down;
+				break;
 
-			case WM_MOUSEWHEEL: {
-				if(c_window::hovered)
-					c_window::hovered->scrollbar_data.target += input::mouse.wheel.y * 20.f;
-			} break;
+			case WM_SYSKEYUP:
+			case WM_KEYUP:
+				widget_msg = e_widget_event::key_up;
+				break;
+
+			case WM_CHAR:
+				widget_msg = e_widget_event::char_add;
+				break;
 
 			default: return -1;
 		}
 
-		return 1;
+		if(i_widget* widget{ i_widget::widgets[e_widget_state::active] ? i_widget::widgets[e_widget_state::active] : i_widget::widgets[e_widget_state::focused] }) {
+			if(std::vector<i_widget*> node{ widget->node.parent_node() }; std::ranges::find_if(node, [](i_widget* parent) { return !(parent->flags & e_widget_flags::visible); }) == node.end()) {
+				if(widget->event_handling(widget_msg, w_param, l_param)) {
+					if(widget->node.parent) widget->node.parent->on_child_event_handled(widget);
+					return 1;
+				}
+				for(i_widget* parent : widget->node.parent_node() | std::views::reverse) {
+					if(parent->event_handling(widget_msg, w_param, l_param)) {
+						if(parent->node.parent) parent->node.parent->on_child_event_handled(parent);
+						return 1;
+					}
+				}
+			}
+		}
+
+		for(std::shared_ptr<c_window> window : c_window::window_stack | std::views::reverse) {
+			if(window->event_handling(widget_msg, w_param, l_param))
+				return 1;
+		}
+
+		switch(widget_msg) {
+			case e_widget_event::mouse_key_down: {
+				if(i_widget::widgets[e_widget_state::focused])
+					i_widget::widgets[e_widget_state::focused]->on_lost_focus(nullptr);
+			} break;
+
+			case e_widget_event::mouse_move: {
+				if(i_widget::widgets[e_widget_state::hovered])
+					i_widget::widgets[e_widget_state::hovered]->on_mouse_exit();
+			} break;
+		}
+
+		return -1;
 	}
 }

@@ -1,160 +1,123 @@
 ﻿#include <iostream>
+#include <mutex>
 #include <null-gui.h>
 #include <null-renderer-directx9.h>
 
 null::renderer::c_window window{ };
 
+void create_ui() {
+	auto window{ new null::gui::c_window{ "test window", { 100 }, { 400, 300 } } };
+	//window->container_flags |= null::e_container_flags::auto_size;
+	{
+		static color_t<int> color{ 255, 255, 255 };
+		window->add_widget(new null::gui::c_color_picker{ "color picker", &color });
+
+		static bool checl_box_value{ };
+		window->add_widget(new null::gui::c_check_box{ "check box", &checl_box_value });
+		
+		static float slider_bar_value{ 55 };
+		window->add_widget(new null::gui::c_slider_bar{ "slider bar", &slider_bar_value, 0, 100 });
+
+		static std::string buffer{ "null-gui" };
+		window->add_widget(new null::gui::c_text_input{ "text input", &buffer });
+
+		static int selected_id{ };
+		std::vector<std::string> single_items(10);
+		std::iota(single_items.begin(), single_items.end(), '0');
+		window->add_widget(new null::gui::c_list_box{ "list box single selectable", &selected_id, single_items, { -1, 100 } });
+
+		static std::vector<std::pair<std::string, bool>> multi_items{ };
+		if(multi_items.empty()) std::ranges::transform(single_items, std::back_inserter(multi_items), [](const std::string& a) { return std::make_pair(a, false); });
+		window->add_widget(new null::gui::c_list_box{ "list box multi selectable", &multi_items });
+
+		window->add_widget(new null::gui::c_combo_box{ "combo", &selected_id, single_items });
+		window->add_widget(new null::gui::c_combo_box{ "multi selectable combo", &multi_items });
+
+		std::ranges::for_each(std::views::iota(0, 6), [&](int id) {
+			window->add_widget(new null::gui::c_button{ std::format("window button {}", id) });
+			});
+
+		auto column_with_size{ new null::gui::c_columns{ { 100, 0, 40 } } }; {
+			std::ranges::for_each(std::views::iota(size_t{ }, column_with_size->node.childs.size()), [&](const size_t& id) {
+				std::ranges::for_each(std::views::iota(0, 3), [&](int id2) {
+					column_with_size->at(id)->add_widget(new null::gui::c_button{ std::to_string(id2) });
+					});
+				});
+		} window->add_widget(column_with_size);
+
+		auto column{ new null::gui::c_columns{ 3 } }; {
+			std::ranges::for_each(std::views::iota(0, 3), [&](int id) {
+				column->at(0)->add_widget(new null::gui::c_button{ std::to_string(id) });
+				});
+
+			std::ranges::for_each(std::views::iota(0, 2), [&](int id) {
+				column->at(1)->add_widget(new null::gui::c_button{ std::to_string(id) });
+				});
+
+			std::ranges::for_each(std::views::iota(0, 4), [&](int id) {
+				column->at(2)->add_widget(new null::gui::c_button{ std::to_string(id) });
+				});
+		} window->add_widget(column);
+
+		auto group{ new null::gui::c_group{ "group", { -1, -1 } } }; {
+			std::ranges::for_each(std::views::iota(0, 17), [&](int id) {
+				group->add_widget(new null::gui::c_button{ std::format("group button {}", id) });
+				});
+		} window->add_widget(group);
+
+		std::ranges::for_each(std::views::iota(6, 21), [&](int id) {
+			window->add_widget(new null::gui::c_button{ std::format("window button {}", id) });
+			});
+	} null::gui::c_window::add_window(window);
+}
+
+void destroy_ui() {
+	null::gui::i_widget::widgets.clear();
+	null::gui::c_window::window_stack.clear();
+}
+
+#define debug_print_widget(widget) \
+	widgets.data.push_back({#widget, { 255, 100, 100 }}); \
+	widgets.data.push_back({std::format(" = "), { }});  \
+	widgets.data.push_back({std::format("{}\n", null::gui::i_widget::widgets[null::gui::widget] ? null::gui::i_widget::widgets[null::gui::widget]->name : "empty"), { 100, 255, 100 }});
+
 void main_loop() {
-	null::input::begin_frame(window);
-	null::render::begin_frame(window); {
-		null::gui::begin_frame(); {
-			if(null::gui::begin_window("style window", { 60, 20 }, { 600, 0 }, null::gui::e_window_flags{ null::gui::e_window_flags::set_size | null::gui::e_window_flags::auto_size })) {
-				null::gui::begin_columns(3); {
-					null::gui::begin_group("global", vec2_t{ 0.f, 100.f }); {
-						null::gui::colorpicker("main_color##global", &null::gui::style::main_color);
-						null::gui::colorpicker("text##global", &null::gui::style::text);
-						null::gui::colorpicker("text_hovered##global", &null::gui::style::text_hovered);
-						null::gui::slider_float("text_spacing##global", &null::gui::style::text_spacing, 1, 20, "{:.0f}");
-						null::gui::slider_float("new_line_size##global", &null::gui::style::new_line_size, 1, 50, "{:.0f}");
-						null::gui::checkbox("items_size_full_window##global", &null::gui::style::items_size_full_window);
-					} null::gui::end_group();
-					
-					null::gui::begin_group("button", vec2_t{ 0.f, 100.f }); {
-						null::gui::colorpicker("box##button", &null::gui::style::button::box);
-						null::gui::colorpicker("box_hovered##button", &null::gui::style::button::box_hovered);
-						null::gui::colorpicker("box_active##button", &null::gui::style::button::box_active);
-						null::gui::slider_float("rounding##button", &null::gui::style::button::rounding, 0.f, 50.f);
+	null::render::begin_frame(window);
+	null::gui::begin_frame();
+	null::input::begin_frame(window); {
+		null::render::multicolor_text_t<std::string> widgets{ };
 
-						null::gui::text("padding##button"); {
-							null::gui::begin_columns(2); {
-								null::gui::slider_float("x##button padding", &null::gui::style::button::padding.x, 0.f, 50.f);
-								null::gui::next_column();
-								null::gui::slider_float("y##button padding", &null::gui::style::button::padding.y, 0.f, 50.f);
-							} null::gui::end_columns();
-						}
-					} null::gui::end_group();
-					
-					null::gui::begin_group("checkbox", vec2_t{ 0.f, 100.f }); {
-						null::gui::slider_float("box_size##checkbox", &null::gui::style::checkbox::box_size, 0.f, 50.f);
-						null::gui::slider_float("check_mark_size##checkbox", &null::gui::style::checkbox::check_mark_size, 0.f, 50.f);
-						null::gui::slider_float("body_offset##checkbox", &null::gui::style::checkbox::body_offset, 0.f, 50.f);
-						null::gui::slider_float("rounding##checkbox", &null::gui::style::checkbox::rounding, 0.f, 50.f);
-						null::gui::checkbox("hovered_with_text##checkbox", &null::gui::style::checkbox::hovered_with_text);
-					} null::gui::end_group();
-					
-					null::gui::begin_group("colorpicker", vec2_t{ 0.f, 100.f }); {
-						null::gui::slider_float("sv_box_size##colorpicker", &null::gui::style::colorpicker::sv_box_size, 0.f, 50.f);
-						null::gui::slider_float("sliders_thickness##colorpicker", &null::gui::style::colorpicker::sliders_thickness, 0.f, 50.f);
-						null::gui::slider_float("rounding##colorpicker", &null::gui::style::colorpicker::rounding, 0.f, 50.f);
-					} null::gui::end_group();
+		debug_print_widget(e_widget_state::active);
+		debug_print_widget(e_widget_state::hovered);
+		debug_print_widget(e_widget_state::focused);
 
-					null::gui::next_column();
-
-					null::gui::begin_group("combo", vec2_t{ 0.f, 100.f }); {
-						null::gui::slider_float("box_size##combo", &null::gui::style::combo::box_size, 0.f, 50.f);
-						null::gui::slider_float("arrow_size##combo", &null::gui::style::combo::arrow_size, 0.f, 50.f);
-						null::gui::slider_float("popup_padding##combo", &null::gui::style::combo::popup_padding, 0.f, 50.f);
-						null::gui::slider_int("autosize_items##combo", &null::gui::style::combo::autosize_items, 0, 50);
-						null::gui::slider_float("rounding##combo", &null::gui::style::combo::rounding, 0.f, 50.f);
-					} null::gui::end_group();
-					
-
-					null::gui::begin_group("scrollbar", vec2_t{ 0.f, 100.f }); {
-						null::gui::slider_float("thickness##scrollbar", &null::gui::style::scrollbar::thickness, 0.f, 50.f);
-						null::gui::slider_float("rounding##scrollbar", &null::gui::style::scrollbar::rounding, 0.f, 50.f);
-
-						null::gui::text("padding##scrollbar"); {
-							null::gui::begin_columns(2); {
-								null::gui::slider_float("x##scrollbar padding", &null::gui::style::scrollbar::padding.x, 0.f, 50.f);
-								null::gui::next_column();
-								null::gui::slider_float("y##scrollbar padding", &null::gui::style::scrollbar::padding.y, 0.f, 50.f);
-							} null::gui::end_columns();
-						}
-
-						null::gui::checkbox("show_background##scrollbar", &null::gui::style::scrollbar::show_background);
-					} null::gui::end_group();
-
-					null::gui::begin_group("selectable", vec2_t{ 0.f, 86.f }); {
-						null::gui::slider_float("offset##selectable", &null::gui::style::selectable::offset, 0.f, 50.f);
-						null::gui::slider_float("active_offset##selectable", &null::gui::style::selectable::active_offset, 0.f, 50.f);
-					} null::gui::end_group();
-
-					null::gui::begin_group("slider", vec2_t{ 0.f, 86.f }); {
-						null::gui::slider_float("thickness##slider", &null::gui::style::slider::thickness, 0.f, 50.f);
-						null::gui::slider_float("rounding##slider", &null::gui::style::slider::rounding, 0.f, 50.f);
-					} null::gui::end_group();
-
-					null::gui::next_column();
-
-					null::gui::begin_group("text_input", vec2_t{ 0.f, 100.f }); {
-						null::gui::colorpicker("select_text##text_input", &null::gui::style::text_input::select_text);
-						null::gui::slider_float("line_size##text_input", &null::gui::style::text_input::line_size, 0.f, 50.f);
-						null::gui::slider_float("rounding##text_input", &null::gui::style::text_input::rounding, 0.f, 50.f);
-
-						null::gui::text("padding##text_input"); {
-							null::gui::begin_columns(2); {
-								null::gui::slider_float("x##text_input padding", &null::gui::style::text_input::padding.x, 0, 50);
-								null::gui::next_column();
-								null::gui::slider_float("y##text_input padding", &null::gui::style::text_input::padding.y, 0, 50);
-							} null::gui::end_columns();
-						}
-					} null::gui::end_group();
-
-					null::gui::begin_group("window", vec2_t{ 0.f, 100.f }); {
-						null::gui::colorpicker("background##window", &null::gui::style::window::background);
-						null::gui::slider_float("item_spacing##window", &null::gui::style::window::item_spacing, 0.f, 50.f);
-						null::gui::slider_float("rounding##window", &null::gui::style::window::rounding, 0.f, 50.f);
-
-						null::gui::text("padding##window"); {
-							null::gui::begin_columns(2); {
-								null::gui::slider_float("x##window padding", &null::gui::style::window::padding.x, 0.f, 50.f);
-								null::gui::next_column();
-								null::gui::slider_float("y##window padding", &null::gui::style::window::padding.y, 0.f, 50.f);
-							} null::gui::end_columns();
-						}
-
-						null::gui::checkbox("clamp_on_screen##window", &null::gui::style::window::clamp_on_screen);
-						null::gui::checkbox("move_on_titlebar##window", &null::gui::style::window::move_on_titlebar);
-					} null::gui::end_group();
-
-					null::gui::begin_group("titlebar", vec2_t{ 0.f, 100.f }); {
-						null::gui::colorpicker("background##titlebar", &null::gui::style::window::titlebar::background);
-						null::gui::slider_float("size##titlebar", &null::gui::style::window::titlebar::size, 0.f, 50.f);
-						null::gui::slider_float("line_size##titlebar", &null::gui::style::window::titlebar::line_size, 0.f, 50.f);
-						null::gui::slider_float("rounding##titlebar", &null::gui::style::window::titlebar::rounding, 0.f, 50.f);
-					} null::gui::end_group();
-
-					null::gui::begin_group("group", vec2_t{ 0.f, 53.f }); {
-						null::gui::colorpicker("background##group", &null::gui::style::group::background);
-					} null::gui::end_group();
-
-					null::gui::begin_group("popup", vec2_t{ 0.f, 53.f }); {
-						null::gui::colorpicker("background##popup", &null::gui::style::popup::background);
-					} null::gui::end_group();
-				} null::gui::end_columns();
-				null::gui::end_window();
-			}
-
-			null::render::background.draw_text(std::format("[ directx9 ] fps: {:3.0f}", 1.f / window.time_data.delta_time), { window.get_window_size().x, 10.f }, { }, null::render::e_text_flags{ -null::render::e_text_flags::aligin_right | -null::render::e_text_flags::aligin_center_y | -null::render::e_text_flags::outline });
-		} null::gui::end_frame();
-	} null::render::end_frame();
+		null::render::background.draw_text(widgets, { });
+		null::render::background.draw_text(std::format("fps: {:3.0f}", 1.f / window.time_data.delta_time), { window.get_window_size().x, 10.f }, { }, null::render::e_text_flags{ -null::render::e_text_flags::aligin_right | -null::render::e_text_flags::aligin_center_y | -null::render::e_text_flags::outline });
+	}
+	null::gui::end_frame();
+	null::render::end_frame();
+	null::renderer::setup_default_draw_data();
 }
 
 int main(HINSTANCE instance) {
 	window = null::renderer::c_window{ instance };
 
-	window.callbacks.add<void()>(utils::win::e_window_callbacks::on_main_loop, main_loop);
-	window.callbacks.add<int(HWND, UINT, WPARAM, LPARAM)>(utils::win::e_window_callbacks::on_wnd_proc, null::input::wnd_proc);
-	window.callbacks.add<int(HWND, UINT, WPARAM, LPARAM)>(utils::win::e_window_callbacks::on_wnd_proc, null::gui::wnd_proc);
-
 	try {
 		null::render::atlas.add_font_from_file_ttf("C:\\Windows\\fonts\\Tahoma.ttf", 13.f, nullptr, null::render::c_font::glyph_t::ranges_cyrillic());
 
-		window.create();
+		window.callbacks.add<void()>(utils::win::e_window_callbacks::on_main_loop, main_loop);
 
+		window.callbacks.add<int(HWND, UINT, WPARAM, LPARAM)>(utils::win::e_window_callbacks::on_wnd_proc, null::input::wnd_proc);
+		window.callbacks.add<int(HWND, UINT, WPARAM, LPARAM)>(utils::win::e_window_callbacks::on_wnd_proc, null::gui::wnd_proc);
+
+		null::input::keys[null::input::e_key_id::num_0].callbacks.add<void()>(null::input::e_key_state::up, create_ui);
+		null::input::keys[null::input::e_key_id::num_1].callbacks.add<void()>(null::input::e_key_state::up, destroy_ui);
+
+		window.create();
+		null::gui::initialize();
 		window.main_loop();
 		window.destroy();
-	} catch(const std::exception& exception) {
-		std::cout << exception.what() << std::endl;
+	} catch(const std::exception& exp) {
+		std::cout << exp.what() << std::endl;
 	}
 }

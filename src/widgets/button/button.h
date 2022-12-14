@@ -1,18 +1,22 @@
 #pragma once
-#include <null-sdk.h>
+#include <widgets/widget.h>
 
 namespace null::gui {
-	namespace style::button {
-		inline color_t<int> box{ 44, 44, 44, 255 };
-		inline color_t<int> box_hovered{ 46, 255 };
-		inline color_t<int> box_active{ 48, 255 };
-		inline float rounding{ };
-		inline vec2_t padding{ 5, 1 };
-	}
+	class c_button : public i_widget {
+	public:
+		struct style_t {
+			color_t<int> default_color{ 50, 50, 50 };
+			color_t<int> hovered_color{ 60, 60, 60 };
+			color_t<int> active_color{ 100, 100, 255 };
 
-	bool button(std::string_view name, const vec2_t& size = { });
+			color_t<int> text_color{ 255, 255, 255 };
+		} style;
 
-	namespace impl::behaviors {
-		bool button(std::string_view name, const rect_t& widget_rect, bool& hovered, bool& pressed);
-	}
+	public:
+		c_button(std::string_view _name) : i_widget(_name) { }
+
+	public:
+		virtual void setup() override;
+		virtual void draw() override;
+	};
 }

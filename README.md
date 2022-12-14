@@ -1,8 +1,14 @@
 # null-gui
-Another iteration of the null-gui, this time without any global changes, just changed the code-and the transfer to the new sdk, input and render, as they say, everything new is well-forgotten old.
-Maybe someday, I will do something with this gui, but it's not a fact, for all this time, writing gui has specifically fucked me up, so so far there is no desire to write something in this direction. If someone sees this repository, it's not worth using it in your projects, the codebase was written by a 16-year-old schoolboy back in 19-20, it's better to use ImGui or any other engine.
+**null-gui** - is a graphical interface, originally developed as a semi-paste of imgui, but after a while I was no longer satisfied with the code base of the old project, and I decided to rewrite everything from scratch (but in the end I still pasted some parts of the code from other projects)
+
+# screenshots
+![screen](https://i.imgur.com/3k7zrd7.png)
+![screen](https://i.imgur.com/Jvez4QG.png)
+
+# todo
+At the moment, it is necessary to rewrite some parts, facilitate the creation of new widgets and add support for layouts.
 
 # dependencies
-[null-render](https://github.com/nullptr-sources/null-render)
-[null-input](https://github.com/nullptr-sources/null-input)
+[null-render](https://github.com/nullptr-sources/null-render)\
+[null-input](https://github.com/nullptr-sources/null-input)\
 [null-sdk](https://github.com/nullptr-sources/null-sdk)

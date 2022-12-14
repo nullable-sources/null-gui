@@ -30,38 +30,40 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\containers\columns\columns.cpp" />
+    <ClCompile Include="src\containers\container.cpp" />
+    <ClCompile Include="src\containers\group\group.cpp" />
+    <ClCompile Include="src\containers\popup\popup.cpp" />
+    <ClCompile Include="src\containers\window\window.cpp" />
     <ClCompile Include="src\null-gui.cpp" />
     <ClCompile Include="src\widgets\button\button.cpp" />
-    <ClCompile Include="src\widgets\checkbox\checkbox.cpp" />
-    <ClCompile Include="src\widgets\clickable-text\clickable-text.cpp" />
-    <ClCompile Include="src\widgets\colorpicker\colorpicker.cpp" />
-    <ClCompile Include="src\widgets\column\column.cpp" />
-    <ClCompile Include="src\widgets\combo\combo.cpp" />
-    <ClCompile Include="src\widgets\group\group.cpp" />
-    <ClCompile Include="src\widgets\multicombo\multicombo.cpp" />
-    <ClCompile Include="src\widgets\scrollbar\scrollbar.cpp" />
+    <ClCompile Include="src\widgets\check-box\check-box.cpp" />
+    <ClCompile Include="src\widgets\color-picker\color-picker.cpp" />
+    <ClCompile Include="src\widgets\combo-box\combo-box.cpp" />
+    <ClCompile Include="src\widgets\list-box\list-box.cpp" />
+    <ClCompile Include="src\widgets\scroll-bar\scroll-bar.cpp" />
     <ClCompile Include="src\widgets\selectable\selectable.cpp" />
-    <ClCompile Include="src\widgets\slider\slider.cpp" />
+    <ClCompile Include="src\widgets\slider-bar\slider-bar.cpp" />
     <ClCompile Include="src\widgets\text-input\text-input.cpp" />
-    <ClCompile Include="src\widgets\text\text.cpp" />
-    <ClCompile Include="src\widgets\window\window.cpp" />
+    <ClCompile Include="src\widgets\widget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\containers\columns\columns.h" />
+    <ClInclude Include="src\containers\container.h" />
+    <ClInclude Include="src\containers\group\group.h" />
+    <ClInclude Include="src\containers\popup\popup.h" />
+    <ClInclude Include="src\containers\window\window.h" />
     <ClInclude Include="src\null-gui.h" />
     <ClInclude Include="src\widgets\button\button.h" />
-    <ClInclude Include="src\widgets\checkbox\checkbox.h" />
-    <ClInclude Include="src\widgets\clickable-text\clickable-text.h" />
-    <ClInclude Include="src\widgets\colorpicker\colorpicker.h" />
-    <ClInclude Include="src\widgets\column\column.h" />
-    <ClInclude Include="src\widgets\combo\combo.h" />
-    <ClInclude Include="src\widgets\group\group.h" />
-    <ClInclude Include="src\widgets\multicombo\multicombo.h" />
-    <ClInclude Include="src\widgets\scrollbar\scrollbar.h" />
+    <ClInclude Include="src\widgets\check-box\check-box.h" />
+    <ClInclude Include="src\widgets\color-picker\color-picker.h" />
+    <ClInclude Include="src\widgets\combo-box\combo-box.h" />
+    <ClInclude Include="src\widgets\list-box\list-box.h" />
+    <ClInclude Include="src\widgets\scroll-bar\scroll-bar.h" />
     <ClInclude Include="src\widgets\selectable\selectable.h" />
-    <ClInclude Include="src\widgets\slider\slider.h" />
+    <ClInclude Include="src\widgets\slider-bar\slider-bar.h" />
     <ClInclude Include="src\widgets\text-input\text-input.h" />
-    <ClInclude Include="src\widgets\text\text.h" />
-    <ClInclude Include="src\widgets\window\window.h" />
+    <ClInclude Include="src\widgets\widget.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
