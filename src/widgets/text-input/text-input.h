@@ -72,10 +72,10 @@ namespace null::gui {
 	public:
 		virtual void on_mouse_move() override;
 
-		virtual void on_mouse_key_down() override;
-		virtual void on_mouse_key_up() override { callbacks.call<void()>(e_widget_callbacks::on_mouse_key_up); }
+		virtual void on_mouse_key_down(const input::e_key_id& key) override;
+		virtual void on_mouse_key_up(const input::e_key_id& key) override { callbacks.at<e_widget_callbacks::on_mouse_key_up>().call(key); }
 
-		virtual void on_key_down(input::e_key_id key) override;
+		virtual void on_key_down(const input::e_key_id& key) override;
 
 		virtual void on_char_add(const std::uint32_t& added_char) override;
 	};

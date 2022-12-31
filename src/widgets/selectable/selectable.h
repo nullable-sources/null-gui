@@ -29,7 +29,7 @@ namespace null::gui {
 		void draw() override;
 		void setup() override;
 
-		void on_mouse_key_down() override { select(); i_widget::on_mouse_key_down(); }
+		void on_mouse_key_down(const input::e_key_id& key) override { select(); i_widget::on_mouse_key_down(key); }
 	};
 
 	class c_single_selectable : public i_selectable {

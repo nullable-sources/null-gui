@@ -20,7 +20,7 @@ namespace null::gui {
 			vec2_t next_position{ };
 		} auto_positioning;
 
-		c_scroll_bar scroll_bar{ "scroll_bar" };
+		c_scroll_bar scroll_bar{ "scroll bar" };
 
 		e_container_flags container_flags{ };
 
@@ -48,6 +48,7 @@ namespace null::gui {
 		virtual void setup() override;
 		virtual void draw() override;
 
+	public:
 		virtual bool event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) override;
 	};
 }

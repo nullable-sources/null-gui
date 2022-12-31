@@ -15,6 +15,7 @@ namespace null::gui {
 			float text_offset{ 4.f }; //@note: offset of box
 
 			vec2_t picker_popup_offset{ 10.f, 0.f };
+			vec2_t box_size{ 40.f, 20.f };
 		} style{ };
 
 	public:
@@ -93,17 +94,16 @@ namespace null::gui {
 		color_t<int>* color{ };
 
 	public:
-		c_color_picker(std::string_view _name, color_t<int>* _color) : i_widget{ _name }, color{ _color }, hsv{ *_color } {
+		c_color_picker(std::string_view _name, color_t<int>* _color, bool withour_alpha_bar = false) : i_widget{ _name }, color{ _color }, hsv{ *_color } {
 			popup = new c_popup{ std::string{ name }.append(" picker popup") }; {
 				popup->container_flags |= e_container_flags::auto_size;
 			} {
-				columns = new c_columns{ 2 }; {
-					columns->container_flags |= e_container_flags::auto_size_x;
-				} {
+				columns = new c_columns{ 2, false }; {
 					sv_box = (c_sv_box*)columns->at(0)->add_widget(new c_sv_box{ name, &hsv });
 					h_bar = (c_h_bar*)columns->at(1)->add_widget(new c_h_bar{ name, &hsv });
 				} popup->add_widget(columns);
 				alpha_bar = (c_alpha_bar*)popup->add_widget(new c_alpha_bar{ name, &hsv });
+				if(withour_alpha_bar) alpha_bar->flags &= ~e_widget_flags::visible;
 			} add_widget(popup);
 		}
 
@@ -115,6 +115,6 @@ namespace null::gui {
 
 	public:
 		virtual void on_child_in_node_event_handled(i_widget* child) override;
-		virtual void on_mouse_key_up() override;
+		virtual void on_mouse_key_up(const input::e_key_id& key) override;
 	};
 }

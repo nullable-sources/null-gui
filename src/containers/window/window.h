@@ -49,6 +49,6 @@ namespace null::gui {
 		virtual void on_child_focused(i_widget* child) override;
 		virtual void on_focused() override;
 		virtual void on_mouse_move() override;
-		virtual void on_mouse_key_down() override;
+		virtual void on_mouse_key_down(const input::e_key_id& key) override;
 	};
 }

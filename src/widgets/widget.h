@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <map>
 
 namespace null::gui {
 	enum class e_widget_flags {
@@ -9,25 +10,6 @@ namespace null::gui {
 		draw_on_top_layer = 1 << 2
 	}; enum_create_bit_operators(e_widget_flags, true);
 	enum_create_cast_operator(e_widget_flags, -);
-
-	enum class e_widget_callbacks {
-		on_focused,
-		on_lost_focus,
-
-		on_mouse_move,
-		on_mouse_enter,
-		on_mouse_exit,
-		on_mouse_key_down,
-		on_mouse_key_up,
-
-		on_mouse_wheel,
-
-		on_key_down,
-		on_key_up,
-		on_char_add,
-
-		can_handle_child, //@note bool(i_widget* child)
-	};
 
 	enum class e_widget_event {
 		mouse_move,
@@ -39,6 +21,42 @@ namespace null::gui {
 		key_up,
 		char_add
 	};
+
+	enum class e_widget_callbacks {
+		on_focused,
+		on_lost_focus,
+
+		on_mouse_move,
+		on_mouse_enter,
+		on_mouse_exit,
+		on_mouse_key_down,
+		on_mouse_key_up,
+		on_mouse_wheel,
+
+		on_key_down,
+		on_key_up,
+		on_char_add,
+
+		can_handle_child,
+	};
+	class i_widget;
+	using widget_callbacks_t = utils::callbacks_tuple_t<
+		utils::callbacks_t<e_widget_callbacks::on_focused, void()>,
+		utils::callbacks_t<e_widget_callbacks::on_lost_focus, void(i_widget*)>,
+
+		utils::callbacks_t<e_widget_callbacks::on_mouse_move, void()>,
+		utils::callbacks_t<e_widget_callbacks::on_mouse_enter, void()>,
+		utils::callbacks_t<e_widget_callbacks::on_mouse_exit, void()>,
+		utils::callbacks_t<e_widget_callbacks::on_mouse_key_down, void(const input::e_key_id&)>,
+		utils::callbacks_t<e_widget_callbacks::on_mouse_key_up, void(const input::e_key_id&)>,
+		utils::callbacks_t<e_widget_callbacks::on_mouse_wheel, void()>,
+
+		utils::callbacks_t<e_widget_callbacks::on_key_down, void(const input::e_key_id&)>,
+		utils::callbacks_t<e_widget_callbacks::on_key_up, void(const input::e_key_id&)>,
+		utils::callbacks_t<e_widget_callbacks::on_char_add, void(const std::uint32_t&)>,
+
+		utils::callbacks_t<e_widget_callbacks::can_handle_child, bool(i_widget*)>
+	>;
 
 	enum class e_widget_state {
 		none,
@@ -77,7 +95,7 @@ namespace null::gui {
 		rect_t bounds{ vec2_t{ std::numeric_limits<float>::min() }, vec2_t{ std::numeric_limits<float>::max() } };
 
 		node_t node{ };
-		array_callbacks_t<e_widget_callbacks> callbacks{ };
+		widget_callbacks_t callbacks{ };
 
 	public:
 		i_widget(std::string_view _name) : name{ _name } { }
@@ -110,19 +128,19 @@ namespace null::gui {
 		virtual void on_focused();
 		virtual void on_lost_focus(i_widget* new_focused_widget);
 
-		virtual void on_mouse_move() { callbacks.call<void()>(e_widget_callbacks::on_mouse_move); }
+		virtual void on_mouse_move() { callbacks.at<e_widget_callbacks::on_mouse_move>().call(); }
 		virtual void on_mouse_enter();
 		virtual void on_mouse_exit();
 
-		virtual void on_mouse_key_down();
-		virtual void on_mouse_key_up();
+		virtual void on_mouse_key_down(const input::e_key_id& key);
+		virtual void on_mouse_key_up(const input::e_key_id& key);
 
-		virtual void on_mouse_wheel() { callbacks.call<void()>(e_widget_callbacks::on_mouse_wheel); }
+		virtual void on_mouse_wheel() { callbacks.at<e_widget_callbacks::on_mouse_wheel>().call(); }
 
-		virtual void on_key_down(input::e_key_id key) { callbacks.call<void()>(e_widget_callbacks::on_key_down); }
-		virtual void on_key_up(input::e_key_id key) { callbacks.call<void()>(e_widget_callbacks::on_key_up); }
+		virtual void on_key_down(const input::e_key_id& key) { callbacks.at<e_widget_callbacks::on_key_down>().call(key); }
+		virtual void on_key_up(const input::e_key_id& key) { callbacks.at<e_widget_callbacks::on_key_up>().call(key); }
 
-		virtual void on_char_add(const std::uint32_t& added_char) { callbacks.call<void()>(e_widget_callbacks::on_char_add); }
+		virtual void on_char_add(const std::uint32_t& added_char) { callbacks.at<e_widget_callbacks::on_char_add>().call(added_char); }
 
 		virtual bool event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param);
 	};

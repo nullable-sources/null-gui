@@ -75,11 +75,6 @@ namespace null::gui {
 	void i_container::draw() {
 		draw_scroll_bar();
 		i_widget::draw();
-		/*if(dynamic_cast<c_columns*>(this))
-			gui_layer.draw_rect_filled(pos + working_region.min, pos + working_region.max, { 255, 0, 0, 100 });
-		else if(dynamic_cast<c_columns::c_column*>(this)) {
-			gui_layer.draw_rect_filled(pos + working_region.min, pos + working_region.max, { 0, 0, 255, 100 });
-		}*/
 	}
 
 	bool i_container::event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {

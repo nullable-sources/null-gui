@@ -12,11 +12,13 @@ namespace null::gui {
 			
 			case WM_LBUTTONDOWN:
 			case WM_RBUTTONDOWN:
+			case WM_MBUTTONDOWN:
 				widget_msg = e_widget_event::mouse_key_down;
-				break;
+			break;
 
 			case WM_LBUTTONUP:
 			case WM_RBUTTONUP:
+			case WM_MBUTTONUP:
 				widget_msg = e_widget_event::mouse_key_up;
 				break;
 
@@ -39,6 +41,23 @@ namespace null::gui {
 				break;
 
 			default: return -1;
+		}
+
+		switch(msg) {
+			case WM_LBUTTONDOWN:
+			case WM_LBUTTONUP:
+				w_param |= (int)input::e_key_id::mouse_left << 8;
+				break;
+
+			case WM_RBUTTONDOWN:
+			case WM_RBUTTONUP:
+				w_param |= (int)input::e_key_id::mouse_right << 8;
+				break;
+
+			case WM_MBUTTONDOWN:
+			case WM_MBUTTONUP:
+				w_param |= (int)input::e_key_id::mouse_middle << 8;
+				break;
 		}
 
 		if(i_widget* widget{ i_widget::widgets[e_widget_state::active] ? i_widget::widgets[e_widget_state::active] : i_widget::widgets[e_widget_state::focused] }) {

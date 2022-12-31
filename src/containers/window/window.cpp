@@ -33,7 +33,7 @@ namespace null::gui {
 		
 		gui_layer.draw_rect_filled(pos, pos + size, style.background_color); //@note: draw background
 		gui_layer.draw_rect_filled(pos, pos + vec2_t{ size.x, style.titlebar_height }, style.titlebar_color); //@note: draw titlebar
-		gui_layer.draw_text(name, rect_t{ pos, pos + vec2_t{ style.titlebar_text_offset, style.titlebar_height } }.center(), { }, render::e_text_flags::aligin_center_y); //@note: draw titlebar text
+		gui_layer.draw_text(name, rect_t{ pos, pos + vec2_t{ style.titlebar_text_offset, style.titlebar_height } }.origin(rect_t::center), { }, render::e_text_flags::aligin_center_y); //@note: draw titlebar text
 
 		gui_layer.push_clip_rect(bounds, true);
 		i_container::draw();
@@ -62,8 +62,8 @@ namespace null::gui {
 		}
 	}
 
-	void c_window::on_mouse_key_down() {
-		i_container::on_mouse_key_down();
+	void c_window::on_mouse_key_down(const input::e_key_id& key) {
+		i_container::on_mouse_key_down(key);
 
 		clicked_offset = input::mouse.pos - pos;
 	}

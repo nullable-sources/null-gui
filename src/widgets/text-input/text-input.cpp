@@ -50,7 +50,7 @@ namespace null::gui {
 		gui_layer.draw_rect_filled(bar_region, field_color);
 
 		gui_layer.push_clip_rect(bar_region, true);
-		gui_layer.draw_text(utf8_buffer, vec2_t{ bar_region.min.x + style.input_text_offset.x, bar_region.center().y }, { }, render::e_text_flags::aligin_center_y);
+		gui_layer.draw_text(utf8_buffer, vec2_t{ bar_region.min.x + style.input_text_offset.x, bar_region.origin(rect_t::center).y }, { }, render::e_text_flags::aligin_center_y);
 
 		if(render::c_font* current_font{ render::c_font::get_current_font() }; current_font && state & e_widget_state::active) {
 			if(selection_data.selecting()) {
@@ -75,7 +75,7 @@ namespace null::gui {
 		i_widget::on_mouse_move();
 	}
 
-	void c_text_input::on_mouse_key_down() {
+	void c_text_input::on_mouse_key_down(const input::e_key_id& key) {
 		write_data.offset = get_hovered_char();
 		write_data.update(style.write_pos_show_duration);
 		selection_data.set(write_data.offset);
@@ -88,10 +88,10 @@ namespace null::gui {
 			widgets[e_widget_state::active] = nullptr;
 		}
 
-		callbacks.call<void()>(e_widget_callbacks::on_mouse_key_down);
+		callbacks.at<e_widget_callbacks::on_mouse_key_down>().call(key);
 	}
 
-	void c_text_input::on_key_down(input::e_key_id key) {
+	void c_text_input::on_key_down(const input::e_key_id& key) {
 		if(!(state & e_widget_state::active)) return;
 
 		write_data.update(style.write_pos_show_duration);

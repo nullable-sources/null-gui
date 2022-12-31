@@ -49,10 +49,8 @@ namespace null::gui {
 
 	bool i_widget::can_handle_child(i_widget* widget) {
 		if(!(widget->flags & e_widget_flags::visible)) return false;
-		const std::vector<std::any>& results{ callbacks.call<bool(i_widget*)>(e_widget_callbacks::can_handle_child, widget) };
-		if(const auto& first_result{ std::ranges::find_if(results, [](const auto& result) { return result.has_value(); }) }; first_result != results.end())
-			return std::any_cast<bool>(*first_result);
-		return true;
+		const std::vector<bool>& results{ callbacks.at<e_widget_callbacks::can_handle_child>().call(widget) };
+		return results.empty() ? true : results.front();
 	}
 
 	void i_widget::on_focused() {
@@ -62,7 +60,7 @@ namespace null::gui {
 		for(i_widget* parent : node.parent_node() | std::views::reverse)
 			parent->on_child_focused(this);
 
-		callbacks.call<void()>(e_widget_callbacks::on_focused);
+		callbacks.at<e_widget_callbacks::on_focused>().call();
 	}
 
 	void i_widget::on_lost_focus(i_widget* new_focused_widget) {
@@ -74,35 +72,35 @@ namespace null::gui {
 		for(i_widget* parent : node.parent_node() | std::views::reverse)
 			parent->on_child_lost_focus(this, new_focused_widget);
 
-		callbacks.call<void()>(e_widget_callbacks::on_lost_focus);
+		callbacks.at<e_widget_callbacks::on_lost_focus>().call(new_focused_widget);
 	}
 
 	void i_widget::on_mouse_enter() {
 		state |= e_widget_state::hovered;
 		widgets[e_widget_state::hovered] = this;
 
-		callbacks.call<void()>(e_widget_callbacks::on_mouse_enter);
+		callbacks.at<e_widget_callbacks::on_mouse_enter>().call();
 	}
 
 	void i_widget::on_mouse_exit() {
 		state &= ~e_widget_state::hovered;
 		widgets[e_widget_state::hovered] = nullptr;
 
-		callbacks.call<void()>(e_widget_callbacks::on_mouse_exit);
+		callbacks.at<e_widget_callbacks::on_mouse_exit>().call();
 	}
 
-	void i_widget::on_mouse_key_down() {
+	void i_widget::on_mouse_key_down(const input::e_key_id& key) {
 		state |= e_widget_state::active;
 		widgets[e_widget_state::active] = this;
 
-		callbacks.call<void()>(e_widget_callbacks::on_mouse_key_down);
+		callbacks.at<e_widget_callbacks::on_mouse_key_down>().call(key);
 	}
 
-	void i_widget::on_mouse_key_up() {
+	void i_widget::on_mouse_key_up(const input::e_key_id& key) {
 		state &= ~e_widget_state::active;
 		widgets[e_widget_state::active] = nullptr;
 
-		callbacks.call<void()>(e_widget_callbacks::on_mouse_key_up);
+		callbacks.at<e_widget_callbacks::on_mouse_key_up>().call(key);
 	}
 
 	bool i_widget::event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
@@ -142,7 +140,7 @@ namespace null::gui {
 			} break;
 			case e_widget_event::mouse_key_down: {
 				if(state & e_widget_state::hovered && (!widgets[e_widget_state::active] || widgets[e_widget_state::active] == this)) {
-					on_mouse_key_down();
+					on_mouse_key_down((input::e_key_id)(w_param >> 8));
 
 					if(widgets[e_widget_state::focused] && widgets[e_widget_state::focused] != this) {
 						widgets[e_widget_state::focused]->on_lost_focus(this);
@@ -157,7 +155,7 @@ namespace null::gui {
 			} break;
 			case e_widget_event::mouse_key_up: {
 				if(state & e_widget_state::active) {
-					on_mouse_key_up();
+					on_mouse_key_up((input::e_key_id)(w_param >> 8));
 
 					return true;
 				}

@@ -13,7 +13,7 @@ namespace null::gui {
 		else if(state & e_widget_state::hovered) button_color = style.hovered_color;
 
 		gui_layer.draw_rect_filled(pos, pos + size, button_color);
-		gui_layer.draw_text(name, rect_t{ pos, pos + size }.center(), style.text_color, render::e_text_flags::aligin_center);
+		gui_layer.draw_text(name, rect_t{ pos, pos + size }.origin(rect_t::center), style.text_color, render::e_text_flags::aligin_center);
 
 		i_widget::draw();
 	}

@@ -24,9 +24,6 @@ namespace null::gui {
 		render::custom_lists.push_back(&gui_layer);
 	}
 
-	static void begin_frame() {
-	}
-
 	static void end_frame() {
 		std::ranges::for_each(c_window::window_stack | std::views::filter([](std::shared_ptr<c_window>& window) { return window->flags & e_widget_flags::visible; }), [](std::shared_ptr<c_window>& window) {
 			window->handle();

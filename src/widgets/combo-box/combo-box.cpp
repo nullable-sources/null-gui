@@ -39,10 +39,10 @@ namespace null::gui {
 
 	std::string c_combo_box::selected_items() {
 		std::string result{ };
-		for(std::shared_ptr<i_widget> widget : popup->node.childs) {
-			if(i_selectable* selectable = dynamic_cast<i_selectable*>(widget.get())) {
-				if(selectable->selected()) result += (result.empty() ? "" : ", ") + selectable->name;
-			}
+		for(i_selectable* selectable : popup->node.childs
+			| std::views::transform([](const std::shared_ptr<i_widget>& widget) { return dynamic_cast<i_selectable*>(widget.get()); })
+			| std::views::filter([](i_selectable* selectable) { return selectable && selectable->selected(); })) {
+			result.append(result.empty() ? "" : ", ").append(selectable->name);
 		}
 		return result;
 	}
@@ -72,13 +72,13 @@ namespace null::gui {
 		gui_layer.draw_rect_filled(bar_region, field_color);
 
 		gui_layer.push_clip_rect(bar_region, true);
-		gui_layer.draw_text(selected_items(), vec2_t{ bar_region.min.x + style.selected_name_offset.x, bar_region.center().y }, { }, render::e_text_flags::aligin_center_y, nullptr, 0.f);
+		gui_layer.draw_text(selected_items(), vec2_t{ bar_region.min.x + style.selected_name_offset.x, bar_region.origin(rect_t::center).y }, { }, render::e_text_flags::aligin_center_y);
 		gui_layer.pop_clip_rect();
 
 		i_widget::draw();
 	}
 
-	void c_combo_box::on_mouse_key_up() {
+	void c_combo_box::on_mouse_key_up(const input::e_key_id& key) {
 		if(!(popup->flags & e_widget_flags::visible)) {
 			on_lost_focus(popup);
 			popup->open();
@@ -86,6 +86,6 @@ namespace null::gui {
 		} else {
 			popup->close();
 		}
-		i_widget::on_mouse_key_up();
+		i_widget::on_mouse_key_up(key);
 	}
 }

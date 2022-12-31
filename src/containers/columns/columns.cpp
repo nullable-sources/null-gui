@@ -13,10 +13,9 @@ namespace null::gui {
 	}
 
 	void c_columns::c_column::setup() {
-		working_region = rect_t{ vec2_t{ 0 }, size };
-		
 		//@note: after that, all child columns will be the same height, perhaps it is better to add a flag to enable/disable this function?
 		size.y = std::max(size.y, node.parent->working_region.size().y);
+		working_region = rect_t{ vec2_t{ 0 }, size };
 		i_container::setup();
 	}
 
@@ -47,19 +46,21 @@ namespace null::gui {
 	}
 
 	void c_columns::setup_widget(i_widget* widget) {
-		if(c_column* column{ static_cast<c_column*>(widget) }) { //@note: that's fucked up
-			if(column->container_flags & e_container_flags::auto_size_x) {
-				column->size.x = std::max(0.f, (size.x - (style.column_padding * (node.childs.size() - 1))) / node.childs.size());
-				float custom_offsets{ };
-				int count{ };
-				for(c_column* child_column : node.childs | std::views::transform([](std::shared_ptr<i_widget>& child) { return static_cast<c_column*>(child.get()); })
-					| std::views::filter([&](c_column* column) { return column && !(column->container_flags & e_container_flags::auto_size_x); })) {
-					custom_offsets += column->size.x - child_column->size.x;
-					count++;
+		if(!(container_flags & e_container_flags::auto_size_x)) {
+			if(c_column * column{ static_cast<c_column*>(widget) }) { //@note: that's fucked up
+				if(column->container_flags & e_container_flags::auto_size_x) {
+					column->size.x = std::max(0.f, (size.x - (style.column_padding * (node.childs.size() - 1))) / node.childs.size());
+					float custom_offsets{ };
+					int count{ };
+					for(c_column* child_column : node.childs | std::views::transform([](std::shared_ptr<i_widget>& child) { return static_cast<c_column*>(child.get()); })
+						| std::views::filter([&](c_column* column) { return column && !(column->container_flags & e_container_flags::auto_size_x); })) {
+						custom_offsets += column->size.x - child_column->size.x;
+						count++;
+					}
+					column->size.x += custom_offsets / (node.childs.size() - count);
 				}
-				column->size.x += custom_offsets / (node.childs.size() - count);
-			}
-		} else throw std::runtime_error{ "childs can contain only columns" };
+			} else throw std::runtime_error{ "childs can contain only columns" };
+		}
 		i_container::setup_widget(widget);
 	}
 
@@ -69,8 +70,8 @@ namespace null::gui {
 	}
 
 	void c_columns::setup() {
+		size.x = node.parent->working_region.size().x;
 		i_container::setup();
-		size.x = std::max(size.x, node.parent->working_region.size().x);
 		working_region = rect_t{ vec2_t{ 0 }, size };
 	}
 

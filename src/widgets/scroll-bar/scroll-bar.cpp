@@ -33,16 +33,16 @@ namespace null::gui {
 			scroll_value = (int)std::clamp((input::mouse.pos.y - pos.y - slider_data.moving_offset) / pixel_per_scroll, 0.f, max_scroll_value);
 	}
 
-	void c_scroll_bar::on_mouse_key_down() {
-		i_widget::on_mouse_key_down();
+	void c_scroll_bar::on_mouse_key_down(const input::e_key_id& key) {
+		i_widget::on_mouse_key_down(key);
 		slider_data.moving_offset = input::mouse.pos.y - slider_data.pos.y;
 
 		if(slider_data.moving_offset > slider_data.size.y || slider_data.moving_offset < 0.f)
 			slider_data.moving_offset = slider_data.size.y / 2.f;
 	}
 
-	void c_scroll_bar::on_mouse_key_up() {
-		i_widget::on_mouse_key_up();
+	void c_scroll_bar::on_mouse_key_up(const input::e_key_id& key) {
+		i_widget::on_mouse_key_up(key);
 		slider_data.moving_offset = 0;
 	}
 

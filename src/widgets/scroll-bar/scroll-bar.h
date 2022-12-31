@@ -46,8 +46,8 @@ namespace null::gui {
 	public:
 		virtual void on_mouse_move() override;
 
-		virtual void on_mouse_key_down() override;
-		virtual void on_mouse_key_up() override;
+		virtual void on_mouse_key_down(const input::e_key_id& key) override;
+		virtual void on_mouse_key_up(const input::e_key_id& key) override;
 
 		virtual void on_mouse_wheel() override;
 

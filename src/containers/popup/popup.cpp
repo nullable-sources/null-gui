@@ -51,7 +51,7 @@ namespace null::gui {
 		
 		gui_layer.draw_rect_filled(pos, pos + size, style.background_color);
 		gui_layer.draw_rect_filled(pos, pos + vec2_t{ size.x, style.titlebar_height }, style.titlebar_color);
-		gui_layer.draw_text(name, rect_t{ pos, pos + vec2_t{ size.x, style.titlebar_height } }.center(), { }, render::e_text_flags::aligin_center);
+		gui_layer.draw_text(name, rect_t{ pos, pos + vec2_t{ size.x, style.titlebar_height } }.origin(rect_t::center), { }, render::e_text_flags::aligin_center);
 
 		i_container::draw();
 		

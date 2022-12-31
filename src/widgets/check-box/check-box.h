@@ -14,6 +14,8 @@ namespace null::gui {
 
 			color_t<int> check_mark_color{ 100, 100, 255 };
 			float check_mark_offset{ 3.f };
+
+			vec2_t box_size{ 20.f };
 		} style;
 
 	public:
@@ -30,6 +32,6 @@ namespace null::gui {
 		virtual void draw() override;
 
 	public:
-		virtual void on_mouse_key_up() override;
+		virtual void on_mouse_key_up(const input::e_key_id& key) override;
 	};
 }

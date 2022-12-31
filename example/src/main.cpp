@@ -45,18 +45,32 @@ void create_ui() {
 				});
 		} window->add_widget(column_with_size);
 
-		auto column{ new null::gui::c_columns{ 3 } }; {
+		auto column_without_auto_size{ new null::gui::c_columns{ 3, false } }; {
 			std::ranges::for_each(std::views::iota(0, 3), [&](int id) {
-				column->at(0)->add_widget(new null::gui::c_button{ std::to_string(id) });
+				column_without_auto_size->at(0)->add_widget(new null::gui::c_button{ std::to_string(id) });
 				});
 
 			std::ranges::for_each(std::views::iota(0, 2), [&](int id) {
-				column->at(1)->add_widget(new null::gui::c_button{ std::to_string(id) });
+				column_without_auto_size->at(1)->add_widget(new null::gui::c_button{ std::to_string(id) });
 				});
 
 			std::ranges::for_each(std::views::iota(0, 4), [&](int id) {
-				column->at(2)->add_widget(new null::gui::c_button{ std::to_string(id) });
+				column_without_auto_size->at(2)->add_widget(new null::gui::c_button{ std::to_string(id) });
 				});
+		} window->add_widget(column_without_auto_size);
+
+		auto column{ new null::gui::c_columns{ 3 } }; {
+			std::ranges::for_each(std::views::iota(0, 3), [&](int id) {
+				column->at(0)->add_widget(new null::gui::c_button{ std::to_string(id) });
+								  });
+
+			std::ranges::for_each(std::views::iota(0, 2), [&](int id) {
+				column->at(1)->add_widget(new null::gui::c_button{ std::to_string(id) });
+								  });
+
+			std::ranges::for_each(std::views::iota(0, 4), [&](int id) {
+				column->at(2)->add_widget(new null::gui::c_button{ std::to_string(id) });
+								  });
 		} window->add_widget(column);
 
 		auto group{ new null::gui::c_group{ "group", { -1, -1 } } }; {
@@ -83,7 +97,6 @@ void destroy_ui() {
 
 void main_loop() {
 	null::render::begin_frame(window);
-	null::gui::begin_frame();
 	null::input::begin_frame(window); {
 		null::render::multicolor_text_t<std::string> widgets{ };
 
@@ -105,13 +118,13 @@ int main(HINSTANCE instance) {
 	try {
 		null::render::atlas.add_font_from_file_ttf("C:\\Windows\\fonts\\Tahoma.ttf", 13.f, nullptr, null::render::c_font::glyph_t::ranges_cyrillic());
 
-		window.callbacks.add<void()>(utils::win::e_window_callbacks::on_main_loop, main_loop);
+		window.callbacks.at<utils::win::e_window_callbacks::on_main_loop>().add(main_loop);
 
-		window.callbacks.add<int(HWND, UINT, WPARAM, LPARAM)>(utils::win::e_window_callbacks::on_wnd_proc, null::input::wnd_proc);
-		window.callbacks.add<int(HWND, UINT, WPARAM, LPARAM)>(utils::win::e_window_callbacks::on_wnd_proc, null::gui::wnd_proc);
+		window.callbacks.at<utils::win::e_window_callbacks::on_wnd_proc>().add(null::input::wnd_proc);
+		window.callbacks.at<utils::win::e_window_callbacks::on_wnd_proc>().add(null::gui::wnd_proc);
 
-		null::input::keys[null::input::e_key_id::num_0].callbacks.add<void()>(null::input::e_key_state::up, create_ui);
-		null::input::keys[null::input::e_key_id::num_1].callbacks.add<void()>(null::input::e_key_state::up, destroy_ui);
+		null::input::keys[null::input::e_key_id::num_0].callbacks.at<null::input::e_key_callbacks::on_up>().add(create_ui);
+		null::input::keys[null::input::e_key_id::num_1].callbacks.at<null::input::e_key_callbacks::on_up>().add(destroy_ui);
 
 		window.create();
 		null::gui::initialize();

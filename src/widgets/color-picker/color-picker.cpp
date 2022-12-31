@@ -35,9 +35,9 @@ namespace null::gui {
 
 	void c_color_picker::c_h_bar::draw() {
 		vec2_t segment_size{ size.x, size.y / 6.f };
-		for(int segment : std::views::iota(0, 6)) {
+		for(const int& segment : std::views::iota(0, 6)) {
 			color_t<int> hsv{ hsv_color_t{ segment * 60.f } }, next_hsv{ hsv_color_t{ (segment + 1) * 60.f } };
-			rect_t segment_rect{ rect_t{ pos + vec2_t{ 0.f, segment_size.y * segment } }.from_min(segment_size) };
+			rect_t segment_rect{ pos + vec2_t{ 0.f, segment_size.y * segment }, segment_size, rect_t::top | rect_t::left };
 			gui_layer.draw_rect_filled_multicolor(segment == 0 || segment == 5 ? math::round(segment_rect) : segment_rect, { hsv, hsv, next_hsv, next_hsv });
 		}
 
@@ -57,7 +57,7 @@ namespace null::gui {
 		i_widget::setup();
 	}
 
-	void c_color_picker::c_alpha_bar::draw() {		
+	void c_color_picker::c_alpha_bar::draw() {
 		float indicator_pos{ std::round(pos.x + hsv->a() * size.x) };
 		color_t<int> rgba{ color_t<float>{ *hsv }, 255 };
 		gui_layer.draw_rect_filled_multicolor(pos, pos + size, { color_t<int>::palette_t::white, rgba, color_t<int>::palette_t::white, rgba });
@@ -77,10 +77,10 @@ namespace null::gui {
 	}
 
 	void c_color_picker::setup() {
-		size = render::c_font::get_current_font()->calc_text_size(name) + vec2_t{ 10, 5 };
-		size.x = std::max(size.x, node.parent->working_region.size().x);
+		size = render::c_font::get_current_font()->calc_text_size(name) + vec2_t{ style.text_offset + style.box_size.x, 0.f };
+		size = math::max(size, vec2_t{ node.parent->working_region.size().x, style.box_size.y });
 
-		working_region = rect_t{ vec2_t{ 0.f }, vec2_t{ size.y * 2.f, size.y } };
+		working_region = rect_t{ vec2_t{ 0.f }, style.box_size };
 		box_region = working_region + pos;
 		i_widget::setup();
 	}
@@ -90,7 +90,7 @@ namespace null::gui {
 		if(state & e_widget_state::active) field_color = style.active_color;
 		else if(state & e_widget_state::hovered) field_color = style.hovered_color;
 
-		gui_layer.draw_text(name, box_region.center() + vec2_t{ box_region.size().x / 2.f + style.text_offset, 0.f }, style.text_color, render::e_text_flags::aligin_center_y);
+		gui_layer.draw_text(name, box_region.origin(rect_t::center) + vec2_t{ box_region.size().x / 2.f + style.text_offset, 0.f }, style.text_color, render::e_text_flags::aligin_center_y);
 		gui_layer.draw_rect_filled(box_region, *color);
 
 		i_widget::draw();
@@ -101,7 +101,7 @@ namespace null::gui {
 		i_widget::on_child_in_node_event_handled(child);
 	}
 
-	void c_color_picker::on_mouse_key_up() {
+	void c_color_picker::on_mouse_key_up(const input::e_key_id& key) {
 		if(!(popup->flags & e_widget_flags::visible)) {
 			hsv = hsv_color_t{ *color };
 
@@ -112,6 +112,6 @@ namespace null::gui {
 		} else {
 			popup->close();
 		}
-		i_widget::on_mouse_key_up();
+		i_widget::on_mouse_key_up(key);
 	}
 }

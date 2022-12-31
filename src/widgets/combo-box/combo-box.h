@@ -84,6 +84,6 @@ namespace null::gui {
 		virtual void draw() override;
 
 	public:
-		virtual void on_mouse_key_up() override;
+		virtual void on_mouse_key_up(const input::e_key_id& key) override;
 	};
 }

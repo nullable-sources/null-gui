@@ -7,10 +7,10 @@ namespace null::gui {
 	}
 
 	void c_check_box::setup() {
-		size = render::c_font::get_current_font()->calc_text_size(name) + vec2_t{ 10, 5 };
-		size.x = std::max(size.x, node.parent->working_region.size().x);
+		size = render::c_font::get_current_font()->calc_text_size(name) + vec2_t{ style.text_offset + style.box_size.x, 0.f };
+		size = math::max(size, vec2_t{ node.parent->working_region.size().x, style.box_size.y });
 
-		working_region = rect_t{ vec2_t{ 0.f }, vec2_t{ size.y } };
+		working_region = rect_t{ vec2_t{ 0.f }, style.box_size };
 		box_region = working_region + pos;
 		i_widget::setup();
 	}
@@ -22,13 +22,13 @@ namespace null::gui {
 
 		gui_layer.draw_rect_filled(box_region, box_color);
 		if(*value) gui_layer.draw_rect_filled(box_region + rect_t{ style.check_mark_offset, -style.check_mark_offset }, style.check_mark_color);
-		gui_layer.draw_text(name, box_region.center() + vec2_t{ box_region.size().x / 2.f + style.text_offset, 0.f }, style.text_color, render::e_text_flags::aligin_center_y);
+		gui_layer.draw_text(name, box_region.origin(rect_t::center) + vec2_t{ box_region.size().x / 2.f + style.text_offset, 0.f }, style.text_color, render::e_text_flags::aligin_center_y);
 
 		i_widget::draw();
 	}
 
-	void c_check_box::on_mouse_key_up() {
+	void c_check_box::on_mouse_key_up(const input::e_key_id& key) {
 		*value = !*value;
-		i_widget::on_mouse_key_up();
+		i_widget::on_mouse_key_up(key);
 	}
 }
