@@ -13,7 +13,7 @@ namespace null::gui {
 
 			color_t<int> background_color{ 45, 45, 45 };
 
-			vec2_t scrollbar_padding{ 5.f, 10.f };
+			vec2_t scroll_bar_padding{ 5.f, 10.f };
 
 			int max_show_items{ 5 };
 		} style{ };
@@ -22,13 +22,16 @@ namespace null::gui {
 		float clamped_size{ };
 
 	public:
-		c_list_box(std::string_view _name, int* value, const std::vector<std::string>& items, vec2_t _size = -1) : c_list_box(_name, _size) { build(value, items); }
-		c_list_box(std::string_view _name, std::vector<std::pair<std::string, bool>>* items, vec2_t _size = -1) : c_list_box(_name, _size) { build(items); }
-		c_list_box(std::string_view _name, vec2_t _size = -1) : i_container(_name) {
+		c_list_box(const std::string_view& _name, int* value, const std::vector<std::string>& items, const vec2_t& _size = -1) : c_list_box{ _name, _size } { build(value, items); }
+		c_list_box(const std::string_view& _name, std::vector<std::pair<std::string, bool>>* items, const vec2_t& _size = -1) : c_list_box{ _name, _size } { build(items); }
+		c_list_box(const std::string_view& _name, const vec2_t& _size = -1) : i_container{ _name } {
+			scroll_bar = (c_scroll_bar*)add_widget(new c_scroll_bar{ });
+			scroll_bar->style.container_working_rect_padding = style.scroll_bar_padding.x;
+			scroll_bar->style.container_padding.y = style.scroll_bar_padding.y;
+
 			size = _size;
-			if(size.x <= 0) container_flags |= e_container_flags::auto_size_x;
-			if(size.y <= 0) container_flags |= e_container_flags::auto_size_y;
-			scroll_bar.style.container_padding.y = style.scrollbar_padding.y;
+			if(size.x <= 0) flags |= e_container_flags::auto_size_x;
+			if(size.y <= 0) flags |= e_container_flags::auto_size_y;
 		}
 
 
@@ -47,8 +50,6 @@ namespace null::gui {
 
 	protected:
 		virtual void setup_bounds() override;
-
-		virtual void setup_scroll_bar() override;
 
 	public:
 		virtual void append_auto_size() override;

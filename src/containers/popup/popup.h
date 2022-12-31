@@ -16,7 +16,8 @@ namespace null::gui {
 		} style{ };
 
 	public:
-		c_popup(std::string_view _name) : i_container(_name) {
+		c_popup(const std::string_view& _name) : i_container{ _name } {
+			scroll_bar = (c_scroll_bar*)add_widget(new c_scroll_bar{ });
 			flags &= ~e_widget_flags::visible;
 		}
 

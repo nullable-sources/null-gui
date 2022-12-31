@@ -16,6 +16,7 @@ namespace null::gui {
 			float wheel_modifyer{ 10.f };
 
 			vec2_t container_padding{ 5.f, 0.f };
+			float container_working_rect_padding{ 0.f };
 			float bar_size{ 5.f };
 			float slider_size{ 3.f };
 		} style{ };
@@ -34,7 +35,7 @@ namespace null::gui {
 		} slider_data{ };
 
 	public:
-		c_scroll_bar(std::string_view _name) : i_widget(_name) { }
+		c_scroll_bar() : i_widget{ "scroll bar" } { flags |= e_widget_flags::ignore_auto_positioning | e_widget_flags::on_top_layer; }
 
 	public:
 		virtual float get_scroll_value() { return std::min(scroll_value, std::max(max_scroll_value, 0.f)); }
@@ -51,6 +52,6 @@ namespace null::gui {
 
 		virtual void on_mouse_wheel() override;
 
-		virtual bool event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) override;
+		virtual bool handling_self_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) override;
 	};
 }

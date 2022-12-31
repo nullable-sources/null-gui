@@ -10,7 +10,7 @@ namespace null::gui {
 	void i_container::setup_widget(i_widget* widget) {
 		if(!(widget->flags & e_widget_flags::ignore_auto_positioning)) {
 			widget->pos = pos + auto_positioning.next_position;
-			widget->pos.y -= scroll_bar.get_scroll_value();
+			if(scroll_bar) widget->pos.y -= scroll_bar->get_scroll_value();
 		}
 
 		widget->setup();
@@ -22,27 +22,9 @@ namespace null::gui {
 		append_auto_size();
 	}
 
-	void i_container::setup_scroll_bar() {
-		if(container_flags & e_container_flags::disable_scroll_bar) return;
-
-		scroll_bar.max_scroll_value = auto_positioning.max_position.y - working_region.max.y;
-		scroll_bar.setup();
-		if(scroll_bar.max_scroll_value > 0) working_region.max.x -= (pos.x + size.x) - scroll_bar.pos.x;
-	}
-
-	void i_container::draw_scroll_bar() {
-		if(container_flags & e_container_flags::disable_scroll_bar) return;
-		scroll_bar.draw();
-	}
-
-	bool i_container::handle_scroll_bar_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
-		if(container_flags & e_container_flags::disable_scroll_bar) return false;
-		return scroll_bar.event_handling(event, w_param, l_param);
-	}
-
 	void i_container::append_auto_size() {
-		if(container_flags & e_container_flags::auto_size_x && auto_positioning.max_position.x) size.x = auto_positioning.max_position.x;
-		if(container_flags & e_container_flags::auto_size_y && auto_positioning.max_position.y) size.y = auto_positioning.max_position.y;
+		if(flags & e_container_flags::auto_size_x && auto_positioning.max_position.x) size.x = auto_positioning.max_position.x;
+		if(flags & e_container_flags::auto_size_y && auto_positioning.max_position.y) size.y = auto_positioning.max_position.y;
 	}
 
 	void i_container::setup_auto_positioning() {
@@ -50,7 +32,7 @@ namespace null::gui {
 	}
 
 	void i_container::append_auto_positioning(i_widget* widget) {
-		auto_positioning.max_position = math::max(auto_positioning.max_position, widget->pos + widget->size - vec2_t{ pos.x, pos.y - scroll_bar.get_scroll_value() });
+		auto_positioning.max_position = math::max(auto_positioning.max_position, widget->pos + widget->size - vec2_t{ pos.x, pos.y - (scroll_bar ? scroll_bar->get_scroll_value() : 0.f) });
 		auto_positioning.next_position.y += widget->size.y;
 	}
 
@@ -63,21 +45,12 @@ namespace null::gui {
 	}
 
 	void i_container::setup() {
+		if(scroll_bar) scroll_bar->max_scroll_value = auto_positioning.max_position.y - working_region.max.y;
 		setup_bounds();
-		setup_scroll_bar();
 		setup_auto_positioning();
 
 		std::ranges::for_each(node.childs | std::views::filter([this](const std::shared_ptr<i_widget>& widget) { return can_handle_child(widget.get()); }), [this](const std::shared_ptr<i_widget>& widget) { setup_widget(widget.get()); });
 
 		append_auto_size();
-	}
-
-	void i_container::draw() {
-		draw_scroll_bar();
-		i_widget::draw();
-	}
-
-	bool i_container::event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
-		return handle_scroll_bar_events(event, w_param, l_param) || i_widget::event_handling(event, w_param, l_param);
 	}
 }

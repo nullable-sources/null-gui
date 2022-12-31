@@ -16,8 +16,8 @@ namespace null::gui {
 			} style{ };
 
 		public:
-			c_column(bool _const_size) : i_container{ "column" } { container_flags |= (_const_size ? e_container_flags::auto_size : e_container_flags::auto_size_y); }
-			c_column(vec2_t _size) : c_column{ _size.x == 0.f } { size = _size; }
+			c_column(const bool& _const_size) : i_container{ "column" } { flags |= (_const_size ? e_container_flags::auto_size : e_container_flags::auto_size_y); }
+			c_column(const vec2_t& _size) : c_column{ _size.x == 0.f } { size = _size; }
 
 		protected:
 			virtual void setup_bounds() override;
@@ -28,24 +28,24 @@ namespace null::gui {
 			virtual void setup() override;
 
 		public:
-			virtual bool event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) override;
+			virtual bool handling_self_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) override { return false; }
 		};
 
 	public:
-		c_columns(int split, bool same_column_size = true) : i_container{ "columns" } {
+		c_columns(const int& split, const bool& same_column_size = true) : i_container{ "columns" } {
 			if(split < 2) throw std::runtime_error{ "there cannot be less than two columns" };
-			container_flags |= e_container_flags::auto_size_y;
-			if(!same_column_size) container_flags |= e_container_flags::auto_size_x;
+			flags |= e_container_flags::auto_size_y;
+			if(!same_column_size) flags |= e_container_flags::auto_size_x;
 			std::ranges::for_each(std::views::iota(0, split), [=](const int&) { add_widget(new c_column{ true }); });
 		}
 
-		c_columns(std::vector<int> sizes) : i_container("columns") {
+		c_columns(const std::vector<int>& sizes) : i_container("columns") {
 			if(sizes.size() < 2) throw std::runtime_error{ "there cannot be less than two columns" };
-			container_flags |= e_container_flags::auto_size_y;
-			std::ranges::for_each(sizes, [=](int& size) { add_widget(new c_column{ { size, 0 } }); });
+			flags |= e_container_flags::auto_size_y;
+			std::ranges::for_each(sizes, [=](const int& size) { add_widget(new c_column{ { size, 0 } }); });
 		}
 
-		i_widget* at(int i) { return node.childs[i].get(); }
+		i_widget* at(const int& i) { return node.childs[i].get(); }
 
 	protected:
 		virtual void setup_bounds() override;
@@ -57,6 +57,6 @@ namespace null::gui {
 		virtual void setup() override;
 
 	public:
-		virtual bool event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) override;
+		virtual bool handling_self_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) override { return false; }
 	};
 }

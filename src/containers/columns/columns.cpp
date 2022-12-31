@@ -19,41 +19,20 @@ namespace null::gui {
 		i_container::setup();
 	}
 
-	bool c_columns::c_column::event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
-		if(!(flags & e_widget_flags::visible)) return false;
-		std::vector<i_widget*> top_layer_childs{ };
-		for(std::shared_ptr<i_widget>& child_widget : node.childs | std::views::filter([this](const std::shared_ptr<i_widget>& widget) { return can_draw_child(widget.get()) && can_handle_child(widget.get()); })) {
-			if(child_widget->flags & e_widget_flags::draw_on_top_layer) top_layer_childs.push_back(child_widget.get());
-			else if(child_widget->event_handling(event, w_param, l_param)) {
-				on_child_event_handled(child_widget.get());
-				return true;
-			}
-		}
-
-		for(i_widget* child : top_layer_childs) {
-			if(child->event_handling(event, w_param, l_param)) {
-				on_child_event_handled(child);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	void c_columns::setup_bounds() {
 		bounds = node.parent->bounds;
 		i_container::setup_bounds();
 	}
 
 	void c_columns::setup_widget(i_widget* widget) {
-		if(!(container_flags & e_container_flags::auto_size_x)) {
+		if(!(flags & e_container_flags::auto_size_x)) {
 			if(c_column * column{ static_cast<c_column*>(widget) }) { //@note: that's fucked up
-				if(column->container_flags & e_container_flags::auto_size_x) {
+				if(column->flags & e_container_flags::auto_size_x) {
 					column->size.x = std::max(0.f, (size.x - (style.column_padding * (node.childs.size() - 1))) / node.childs.size());
 					float custom_offsets{ };
 					int count{ };
 					for(c_column* child_column : node.childs | std::views::transform([](std::shared_ptr<i_widget>& child) { return static_cast<c_column*>(child.get()); })
-						| std::views::filter([&](c_column* column) { return column && !(column->container_flags & e_container_flags::auto_size_x); })) {
+						| std::views::filter([&](c_column* column) { return column && !(column->flags & e_container_flags::auto_size_x); })) {
 						custom_offsets += column->size.x - child_column->size.x;
 						count++;
 					}
@@ -73,26 +52,5 @@ namespace null::gui {
 		size.x = node.parent->working_region.size().x;
 		i_container::setup();
 		working_region = rect_t{ vec2_t{ 0 }, size };
-	}
-
-	bool c_columns::event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
-		if(!(flags & e_widget_flags::visible)) return false;
-		std::vector<i_widget*> top_layer_childs{ };
-		for(std::shared_ptr<i_widget>& child_widget : node.childs | std::views::filter([this](const std::shared_ptr<i_widget>& widget) { return can_draw_child(widget.get()) && can_handle_child(widget.get()); })) {
-			if(child_widget->flags & e_widget_flags::draw_on_top_layer) top_layer_childs.push_back(child_widget.get());
-			else if(child_widget->event_handling(event, w_param, l_param)) {
-				on_child_event_handled(child_widget.get());
-				return true;
-			}
-		}
-
-		for(i_widget* child : top_layer_childs) {
-			if(child->event_handling(event, w_param, l_param)) {
-				on_child_event_handled(child);
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

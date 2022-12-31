@@ -15,11 +15,12 @@ namespace null::gui {
 			float text_offset{ 2.f }, selected_text_offset{ 5.f };
 			float height_padding{ 2.f };
 		} style{ };
+
 	public:
 		int id{ };
 
 	public:
-		i_selectable(std::string_view _name, int _id) : i_widget(_name), id(_id) { }
+		i_selectable(const std::string_view& _name, const int& _id) : i_widget{ _name }, id{ _id } { }
 
 	public:
 		virtual bool selected() { return false; }
@@ -37,7 +38,7 @@ namespace null::gui {
 		int* value{ };
 
 	public:
-		c_single_selectable(std::string_view _name, int* _value, int _id) : i_selectable(_name, _id), value(_value) { }
+		c_single_selectable(const std::string_view& _name, int* _value, const int& _id) : i_selectable{ _name, _id }, value{ _value } { }
 
 	public:
 		bool selected() override { return *value == id; }
@@ -49,7 +50,7 @@ namespace null::gui {
 		bool* value{ };
 
 	public:
-		c_multi_selectable(std::string_view _name, bool* _value, int _id) : i_selectable(_name, _id), value(_value) { }
+		c_multi_selectable(const std::string_view& _name, bool* _value, const int& _id) : i_selectable{ _name, _id }, value{ _value } { }
 
 	public:
 		bool selected() override { return *value; }

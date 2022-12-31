@@ -13,7 +13,7 @@ namespace null::gui {
 		} style;
 
 	public:
-		c_button(std::string_view _name) : i_widget(_name) { }
+		c_button(const std::string_view& _name) : i_widget{ _name } { }
 
 	public:
 		virtual void setup() override;

@@ -56,7 +56,7 @@ namespace null::gui {
 		selection_data_t selection_data{ };
 
 	public:
-		c_text_input(std::string_view _name, std::string* _output_buffer) : i_widget(_name), output_buffer(_output_buffer), write_data{ false, 0, std::chrono::steady_clock::now() } { utf8_buffer = utils::encoding::ascii_to_utf8(*output_buffer); write_data.offset = utf8_buffer.length(); }
+		c_text_input(const std::string_view& _name, std::string* _output_buffer) : i_widget{ _name }, output_buffer{ _output_buffer }, write_data{ false, 0, std::chrono::steady_clock::now() } { utf8_buffer = utils::encoding::ascii_to_utf8(*output_buffer); write_data.offset = utf8_buffer.length(); }
 
 	private:
 		virtual bool filter(const std::uint32_t& symbol);

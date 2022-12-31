@@ -6,13 +6,13 @@ namespace null::gui {
 		i_container::setup_bounds();
 	}
 
-	void c_list_box::setup_scroll_bar() {
+	/*void c_list_box::setup_scroll_bar() {
 		i_container::setup_scroll_bar();
-		if(scroll_bar.max_scroll_value > 0) working_region.max.x -= style.scrollbar_padding.x;
-	}
+		if(scroll_bar && scroll_bar->max_scroll_value > 0) working_region.max.x -= style.scrollbar_padding.x;
+	}*/
 
 	void c_list_box::append_auto_size() {
-		if(container_flags & e_container_flags::auto_size_y) size.y = clamped_size ? clamped_size : auto_positioning.max_position.y;
+		if(flags & e_container_flags::auto_size_y) size.y = clamped_size ? clamped_size : auto_positioning.max_position.y;
 	}
 
 	void c_list_box::append_auto_positioning(i_widget* widget) {
@@ -22,7 +22,7 @@ namespace null::gui {
 	}
 
 	void c_list_box::setup() {
-		if(container_flags & e_container_flags::auto_size_x)
+		if(flags & e_container_flags::auto_size_x)
 			size.x = node.parent->working_region.size().x;
 
 		working_region = { vec2_t{ 0.f, style.titlebar_height }, size };

@@ -23,7 +23,7 @@ namespace null::gui {
 		bool* value{ };
 
 	public:
-		c_check_box(std::string_view _name, bool* _value) : i_widget(_name), value(_value) { }
+		c_check_box(const std::string_view& _name, bool* _value) : i_widget{ _name }, value{ _value } { }
 
 	public:
 		virtual bool can_hovered() override;

@@ -38,13 +38,13 @@ namespace null::gui {
 	}
 
 	void i_widget::draw() {
-		std::vector<i_widget*> draw_on_top_layer{ };
+		std::vector<i_widget*> on_top_layer{ };
 		for(std::shared_ptr<i_widget>& widget : node.childs | std::views::filter([this](const std::shared_ptr<i_widget>& widget) { return can_draw_child(widget.get()) && can_handle_child(widget.get()); })) {
-			if(widget->flags & e_widget_flags::draw_on_top_layer) draw_on_top_layer.push_back(widget.get());
+			if(widget->flags & e_widget_flags::on_top_layer) on_top_layer.push_back(widget.get());
 			else widget->draw();
 		}
 
-		std::ranges::for_each(draw_on_top_layer, [](i_widget* widget) { widget->draw(); });
+		std::ranges::for_each(on_top_layer, [](i_widget* widget) { widget->draw(); });
 	}
 
 	bool i_widget::can_handle_child(i_widget* widget) {
@@ -103,24 +103,28 @@ namespace null::gui {
 		callbacks.at<e_widget_callbacks::on_mouse_key_up>().call(key);
 	}
 
-	bool i_widget::event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
-		if(!(flags & e_widget_flags::visible)) return false;
-		std::vector<i_widget*> top_layer_childs{ };
+	bool i_widget::handling_child_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
+		std::vector<i_widget*> bottom_layer_childs{ };
 		for(std::shared_ptr<i_widget>& child_widget : node.childs | std::views::filter([this](const std::shared_ptr<i_widget>& widget) { return can_draw_child(widget.get()) && can_handle_child(widget.get()); })) {
-			if(child_widget->flags & e_widget_flags::draw_on_top_layer) top_layer_childs.push_back(child_widget.get());
-			else if(child_widget->event_handling(event, w_param, l_param)) {
-				on_child_event_handled(child_widget.get());
-				return true;
-			}
+			if(child_widget->flags & e_widget_flags::on_top_layer) {
+				if(child_widget->event_handling(event, w_param, l_param)) {
+					on_child_event_handled(child_widget.get());
+					return true;
+				}
+			} else bottom_layer_childs.push_back(child_widget.get());
 		}
 
-		for(i_widget* child : top_layer_childs) {
+		for(i_widget* child : bottom_layer_childs) {
 			if(child->event_handling(event, w_param, l_param)) {
 				on_child_event_handled(child);
 				return true;
 			}
 		}
 
+		return false;
+	}
+
+	bool i_widget::handling_self_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
 		switch(event) {
 			case e_widget_event::mouse_move: {
 				if(widgets[e_widget_state::active] && widgets[e_widget_state::active] != this) return false;
@@ -192,5 +196,10 @@ namespace null::gui {
 		}
 
 		return false;
+	}
+
+	bool i_widget::event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
+		if(!(flags & e_widget_flags::visible)) return false;
+		return handling_child_events(event, w_param, l_param) || handling_self_events(event, w_param, l_param);
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace null::gui {
 	void c_scroll_bar::setup() {
-		if(max_scroll_value <= 0.f) { return; }
+		if(max_scroll_value <= 0.f) return;
 
 		pos = vec2_t{ node.parent->pos.x + node.parent->size.x - style.container_padding.x - style.bar_size, node.parent->pos.y + node.parent->working_region.min.y + style.container_padding.y };
 		size = vec2_t{ style.bar_size, node.parent->working_region.size().y - style.container_padding.y * 2 };
@@ -10,6 +10,9 @@ namespace null::gui {
 		pixel_per_scroll = size.y / (size.y + max_scroll_value);
 		slider_data.pos = pos + vec2_t{ 0.f, pixel_per_scroll * get_scroll_value() };
 		slider_data.size = { size.x, std::max(size.y * pixel_per_scroll, 4.f) };
+
+		//@todo: rewrite this trash after implementing layouts
+		node.parent->working_region.max.x -= (node.parent->pos.x + node.parent->size.x) - pos.x + style.container_working_rect_padding;
 
 		i_widget::setup();
 	}
@@ -51,8 +54,8 @@ namespace null::gui {
 		i_widget::on_mouse_wheel();
 	}
 
-	bool c_scroll_bar::event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
+	bool c_scroll_bar::handling_self_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
 		if(max_scroll_value <= 0.f || pixel_per_scroll < 0) return false;
-		return i_widget::event_handling(event, w_param, l_param);
+		return i_widget::handling_self_events(event, w_param, l_param);
 	}
 }

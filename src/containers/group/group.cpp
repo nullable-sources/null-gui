@@ -7,7 +7,7 @@ namespace null::gui {
 	}
 
 	void c_group::append_auto_size() {
-		if(container_flags & e_container_flags::auto_size_y && auto_positioning.max_position.y)
+		if(flags & e_container_flags::auto_size_y && auto_positioning.max_position.y)
 			size.y = auto_positioning.max_position.y + style.padding.y;
 	}
 
@@ -17,7 +17,7 @@ namespace null::gui {
 	}
 
 	void c_group::setup() {
-		if(container_flags & e_container_flags::auto_size_x)
+		if(flags & e_container_flags::auto_size_x)
 			size.x = node.parent->working_region.size().x;
 
 		working_region = { vec2_t{ 0.f, style.titlebar_height } + style.padding, size - style.padding };

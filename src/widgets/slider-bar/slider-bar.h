@@ -29,7 +29,7 @@ namespace null::gui {
 		std::string format{ "{:.0f}" };
 
 	public:
-		c_slider_bar(std::string_view _name, float* _value, float _min_value, float _max_value) : i_widget(_name), value(_value), min_value(std::min(_min_value, _max_value)), max_value(std::max(_min_value, _max_value)) { }
+		c_slider_bar(const std::string_view& _name, float* _value, const float& _min_value, const float& _max_value) : i_widget{ _name }, value{ _value }, min_value{ std::min(_min_value, _max_value) }, max_value{ std::max(_min_value, _max_value) } { }
 
 	public:
 		virtual bool can_hovered() override;

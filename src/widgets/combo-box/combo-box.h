@@ -24,7 +24,7 @@ namespace null::gui {
 				float offset_from_box{ 4.f };
 				color_t<int> background_color{ 45, 45, 45 };
 
-				vec2_t scrollbar_padding{ 5.f, 10.f };
+				vec2_t scroll_bar_padding{ 5.f, 10.f };
 
 				int max_show_items{ 5 };
 			} style{ };
@@ -33,7 +33,11 @@ namespace null::gui {
 			float clamped_size{ };
 
 		public:
-			c_list_popup() : c_popup("combo popup") { scroll_bar.style.container_padding.y = style.scrollbar_padding.y; }
+			c_list_popup() : c_popup{ "combo popup" } {
+				scroll_bar = (c_scroll_bar*)add_widget(new c_scroll_bar{ });
+				scroll_bar->style.container_working_rect_padding = style.scroll_bar_padding.x;
+				scroll_bar->style.container_padding.y = style.scroll_bar_padding.y;
+			}
 
 		public:
 			void build(int* value, const std::vector<std::string>& items) {
@@ -50,7 +54,6 @@ namespace null::gui {
 
 		public:
 			virtual void setup_bounds() override;
-			virtual void setup_scroll_bar() override;
 			virtual void append_auto_size() override;
 			void append_auto_positioning(i_widget* widget) override;
 
@@ -65,9 +68,9 @@ namespace null::gui {
 		rect_t bar_region{ };
 
 	public:
-		c_combo_box(std::string_view _name, int* value, std::vector<std::string>& items) : c_combo_box(_name) { popup->build(value, items); }
-		c_combo_box(std::string_view _name, std::vector<std::pair<std::string, bool>>* multi_items) : c_combo_box(_name) { popup->build(multi_items); }
-		c_combo_box(std::string_view _name) : i_widget(_name) {
+		c_combo_box(const std::string_view& _name, int* value, const std::vector<std::string>& items) : c_combo_box{ _name } { popup->build(value, items); }
+		c_combo_box(const std::string_view& _name, std::vector<std::pair<std::string, bool>>* multi_items) : c_combo_box{ _name } { popup->build(multi_items); }
+		c_combo_box(const std::string_view& _name) : i_widget{ _name } {
 			//@note: or
 			//	popup = new c_list_popup{ };
 			//  add_widget(popup);

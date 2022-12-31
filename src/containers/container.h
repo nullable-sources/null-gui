@@ -4,36 +4,27 @@
 
 namespace null::gui {
 	enum class e_container_flags {
-		none,
-		auto_size_x = 1 << 0,
-		auto_size_y = 1 << 1,
+		auto_size_x = 1 << 3,
+		auto_size_y = 1 << 4,
 		auto_size = auto_size_x | auto_size_y,
-
-		disable_scroll_bar = 1 << 2,
 	}; enum_create_bit_operators(e_container_flags, true);
 	enum_create_cast_operator(e_container_flags, -);
 
 	class i_container : public i_widget {
 	public:
 		struct auto_positioning_t {
-			vec2_t max_position{ };
-			vec2_t next_position{ };
+			vec2_t max_position{ }, next_position{ };
 		} auto_positioning;
 
-		c_scroll_bar scroll_bar{ "scroll bar" };
-
-		e_container_flags container_flags{ };
+		c_scroll_bar* scroll_bar{ };
 
 	public:
-		i_container(std::string_view _name) : i_widget(_name) { scroll_bar.node.parent = this; }
+		i_container(const std::string_view& _name) : i_widget{ _name } { }
+		i_container(const std::string_view& _name, const vec2_t& _pos, const vec2_t& _size) : i_widget{ _name } { pos = _pos; size = _size; }
 
 	protected:
 		virtual void setup_bounds();
 		virtual void setup_widget(i_widget* widget);
-
-		virtual void setup_scroll_bar();
-		virtual void draw_scroll_bar();
-		virtual bool handle_scroll_bar_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param);
 
 	public:
 		virtual void open() { flags |= e_widget_flags::visible; }
@@ -46,9 +37,5 @@ namespace null::gui {
 		virtual i_widget* add_widget(i_widget* widget) override;
 
 		virtual void setup() override;
-		virtual void draw() override;
-
-	public:
-		virtual bool event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) override;
 	};
 }

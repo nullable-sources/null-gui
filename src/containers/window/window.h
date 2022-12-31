@@ -28,8 +28,8 @@ namespace null::gui {
 		vec2_t clicked_offset{ };
 
 	public:
-		c_window(std::string_view _name, vec2_t _pos, vec2_t _size) : i_container(_name) {
-			pos = _pos; size = _size;
+		c_window(const std::string_view& _name, const vec2_t& _pos, const vec2_t& _size) : i_container{ _name, _pos, _size } {
+			scroll_bar = (c_scroll_bar*)add_widget(new c_scroll_bar{ });
 		}
 
 		virtual bool is_topmost() { return window_stack.back().get() == this; }

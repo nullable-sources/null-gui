@@ -7,7 +7,7 @@ namespace null::gui {
 		none,
 		visible = 1 << 0,
 		ignore_auto_positioning = 1 << 1,
-		draw_on_top_layer = 1 << 2
+		on_top_layer = 1 << 2
 	}; enum_create_bit_operators(e_widget_flags, true);
 	enum_create_cast_operator(e_widget_flags, -);
 
@@ -98,7 +98,7 @@ namespace null::gui {
 		widget_callbacks_t callbacks{ };
 
 	public:
-		i_widget(std::string_view _name) : name{ _name } { }
+		i_widget(const std::string_view& _name) : name{ _name } { }
 
 	public:
 		virtual bool can_hovered() {
@@ -142,6 +142,8 @@ namespace null::gui {
 
 		virtual void on_char_add(const std::uint32_t& added_char) { callbacks.at<e_widget_callbacks::on_char_add>().call(added_char); }
 
+		virtual bool handling_child_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param);
+		virtual bool handling_self_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param);
 		virtual bool event_handling(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param);
 	};
 }

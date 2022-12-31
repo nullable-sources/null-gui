@@ -14,8 +14,8 @@ namespace null::gui {
 
 	void c_window::append_auto_size() {
 		i_container::append_auto_size();
-		if(container_flags & e_container_flags::auto_size_x) size.x += style.padding.x;
-		if(container_flags & e_container_flags::auto_size_y) size.y += style.padding.y;
+		if(flags & e_container_flags::auto_size_x) size.x += style.padding.x;
+		if(flags & e_container_flags::auto_size_y) size.y += style.padding.y;
 	}
 
 	void c_window::append_auto_positioning(i_widget* widget) {

@@ -17,10 +17,12 @@ namespace null::gui {
 		} style{ };
 
 	public:
-		c_group(std::string_view _name, vec2_t _size = -1) : i_container(_name) {
+		c_group(const std::string_view& _name, const vec2_t& _size = -1) : i_container{ _name } {
+			scroll_bar = (c_scroll_bar*)add_widget(new c_scroll_bar{ });
+
 			size = _size;
-			if(size.x <= 0) container_flags |= e_container_flags::auto_size_x;
-			if(size.y <= 0) container_flags |= e_container_flags::auto_size_y;
+			if(size.x <= 0) flags |= e_container_flags::auto_size_x;
+			if(size.y <= 0) flags |= e_container_flags::auto_size_y;
 		}
 
 	protected:

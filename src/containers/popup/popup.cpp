@@ -21,19 +21,19 @@ namespace null::gui {
 	void c_popup::open() {
 		i_container::open();
 
-		node.parent->flags |= e_widget_flags::draw_on_top_layer;
+		node.parent->flags |= e_widget_flags::on_top_layer;
 	}
 
 	void c_popup::close() {
 		i_container::close();
 
-		node.parent->flags &= ~e_widget_flags::draw_on_top_layer;
+		node.parent->flags &= ~e_widget_flags::on_top_layer;
 	}
 
 	void c_popup::append_auto_size() {
 		i_container::append_auto_size();
-		if(container_flags & e_container_flags::auto_size_x) size.x += style.padding.x;
-		if(container_flags & e_container_flags::auto_size_y) size.y += style.padding.y;
+		if(flags & e_container_flags::auto_size_x) size.x += style.padding.x;
+		if(flags & e_container_flags::auto_size_y) size.y += style.padding.y;
 	}
 
 	void c_popup::append_auto_positioning(i_widget* widget) {

@@ -5,10 +5,10 @@ namespace null::gui {
 		bounds = { pos, pos + size };
 	}
 
-	void c_combo_box::c_list_popup::setup_scroll_bar() {
+	/*void c_combo_box::c_list_popup::setup_scroll_bar() {
 		i_container::setup_scroll_bar();
-		if(scroll_bar.max_scroll_value > 0) working_region.max.x -= style.scrollbar_padding.x;
-	}
+		if(scroll_bar && scroll_bar->max_scroll_value > 0) working_region.max.x -= style.scrollbar_padding.x;
+	}*/
 
 	void c_combo_box::c_list_popup::append_auto_size() {
 		size.y = clamped_size ? clamped_size : auto_positioning.max_position.y;
