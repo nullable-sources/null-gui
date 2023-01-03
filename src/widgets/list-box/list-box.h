@@ -1,21 +1,14 @@
 #pragma once
-#include <widgets/widget.h>
+#include <interfaces/list-box/list-box.h>
 #include <widgets/selectable/selectable.h>
-#include <containers/container.h>
 
 namespace null::gui {
-	class c_list_box : public i_container {
+	class c_list_box : public interfaces::i_list_box {
 	public:
 		struct style_t {
-			float titlebar_height{ 15 };
-			float titlebar_text_offset{ 10 };
-			color_t<int> titlebar_color{ 100, 100, 255 };
-
 			color_t<int> background_color{ 45, 45, 45 };
 
 			vec2_t scroll_bar_padding{ 5.f, 10.f };
-
-			int max_show_items{ 5 };
 		} style{ };
 
 	private:
@@ -24,38 +17,18 @@ namespace null::gui {
 	public:
 		c_list_box(const std::string_view& _name, int* value, const std::vector<std::string>& items, const vec2_t& _size = -1) : c_list_box{ _name, _size } { build(value, items); }
 		c_list_box(const std::string_view& _name, std::vector<std::pair<std::string, bool>>* items, const vec2_t& _size = -1) : c_list_box{ _name, _size } { build(items); }
-		c_list_box(const std::string_view& _name, const vec2_t& _size = -1) : i_container{ _name } {
-			scroll_bar = (c_scroll_bar*)add_widget(new c_scroll_bar{ });
-			scroll_bar->style.container_working_rect_padding = style.scroll_bar_padding.x;
-			scroll_bar->style.container_padding.y = style.scroll_bar_padding.y;
-
+		c_list_box(const std::string_view& _name, const vec2_t& _size = -1) : interfaces::i_widget{ _name } {
+			i_layout::style.spacing = 0.f;
+			
 			size = _size;
-			if(size.x <= 0) flags |= e_container_flags::auto_size_x;
-			if(size.y <= 0) flags |= e_container_flags::auto_size_y;
-		}
+			if(size.x <= 0) flags |= e_layout_flags::auto_size_x;
+			if(size.y <= 0) flags |= e_layout_flags::auto_size_y;
 
+			create_default_widgets(size.y <= 0 ? e_layout_flags::auto_size_y : e_layout_flags{ }, { style.scroll_bar_padding, { 0.f } });
+		}
 
 	public:
-		void build(int* value, const std::vector<std::string>& items) {
-			std::ranges::for_each(std::views::iota(0, (int)items.size()), [&](const int& item_id) {
-				add_widget(new c_single_selectable{ items[item_id], value, item_id });
-				});
-		}
-
-		void build(std::vector<std::pair<std::string, bool>>* items) {
-			std::ranges::for_each(std::views::iota(0, (int)items->size()), [&](const int& item_id) {
-				add_widget(new c_multi_selectable{ (*items)[item_id].first, &(*items)[item_id].second, item_id });
-				});
-		}
-
-	protected:
-		virtual void setup_bounds() override;
-
-	public:
-		virtual void append_auto_size() override;
-		virtual void append_auto_positioning(i_widget* widget) override;
-
-		virtual void setup() override;
+		virtual void setup_self() override;
 		virtual void draw() override;
 	};
 }

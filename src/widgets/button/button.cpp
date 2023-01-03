@@ -1,10 +1,9 @@
 #include <null-gui.h>
 
 namespace null::gui {
-	void c_button::setup() {
+	void c_button::setup_self() {
 		size = render::c_font::get_current_font()->calc_text_size(name) + vec2_t{ 10, 5 };
 		size.x = std::max(size.x, node.parent->working_region.size().x);
-		i_widget::setup();
 	}
 
 	void c_button::draw() {

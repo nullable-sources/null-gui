@@ -1,8 +1,8 @@
 #pragma once
-#include <widgets/widget.h>
+#include <interfaces/widget/widget.h>
 
 namespace null::gui {
-	class c_text_input : public i_widget {
+	class c_text_input : public interfaces::i_widget {
 	public:
 		struct style_t {
 			color_t<int> default_color{ 50, 50, 50 };
@@ -46,7 +46,6 @@ namespace null::gui {
 		};
 
 	public:
-		rect_t bar_region{ };
 		rect_t field_region{ };
 
 		std::string* output_buffer{ };
@@ -56,7 +55,7 @@ namespace null::gui {
 		selection_data_t selection_data{ };
 
 	public:
-		c_text_input(const std::string_view& _name, std::string* _output_buffer) : i_widget{ _name }, output_buffer{ _output_buffer }, write_data{ false, 0, std::chrono::steady_clock::now() } { utf8_buffer = utils::encoding::ascii_to_utf8(*output_buffer); write_data.offset = utf8_buffer.length(); }
+		c_text_input(const std::string_view& _name, std::string* _output_buffer) : interfaces::i_widget{ _name }, output_buffer{ _output_buffer }, write_data{ false, 0, std::chrono::steady_clock::now() } { utf8_buffer = utils::encoding::ascii_to_utf8(*output_buffer); write_data.offset = utf8_buffer.length(); }
 
 	private:
 		virtual bool filter(const std::uint32_t& symbol);
@@ -64,9 +63,9 @@ namespace null::gui {
 		virtual int get_hovered_char();
 
 	public:
-		virtual bool can_hovered() override;
+		virtual bool can_hovered() const override;
 
-		virtual void setup() override;
+		virtual void setup_self() override;
 		virtual void draw() override;
 
 	public:

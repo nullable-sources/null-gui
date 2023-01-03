@@ -1,8 +1,8 @@
 #pragma once
-#include <widgets/widget.h>
+#include <interfaces/widget/widget.h>
 
 namespace null::gui {
-	class c_slider_bar : public i_widget {
+	class c_slider_bar : public interfaces::i_widget {
 	public:
 		struct style_t {
 			color_t<int> default_color{ 50, 50, 50 };
@@ -19,8 +19,6 @@ namespace null::gui {
 		} style{ };
 
 	public:
-		rect_t bar_region{ };
-
 		float pixels_per_value{ };
 
 		float min_value{ }, max_value{ };
@@ -29,12 +27,12 @@ namespace null::gui {
 		std::string format{ "{:.0f}" };
 
 	public:
-		c_slider_bar(const std::string_view& _name, float* _value, const float& _min_value, const float& _max_value) : i_widget{ _name }, value{ _value }, min_value{ std::min(_min_value, _max_value) }, max_value{ std::max(_min_value, _max_value) } { }
+		c_slider_bar(const std::string_view& _name, float* _value, const float& _min_value, const float& _max_value) : interfaces::i_widget{ _name }, value{ _value }, min_value{ std::min(_min_value, _max_value) }, max_value{ std::max(_min_value, _max_value) } { }
 
 	public:
-		virtual bool can_hovered() override;
+		virtual bool can_hovered() const override;
 
-		virtual void setup() override;
+		virtual void setup_self() override;
 		virtual void draw() override;
 
 	public:

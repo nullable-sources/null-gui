@@ -6,28 +6,28 @@ namespace null::gui {
 	}
 
 	int c_text_input::get_hovered_char() {
-		if(field_region.min.x >= input::mouse.pos.x) return 0;
-		if(field_region.max.x <= input::mouse.pos.x) return utf8_buffer.length();
+		if(field_region.min.x >= input::mouse.pos.x - pos.x) return 0;
+		if(field_region.max.x <= input::mouse.pos.x - pos.x) return utf8_buffer.length();
 
 		render::c_font* current_font{ render::c_font::get_current_font() };
 		if(!current_font) throw std::runtime_error{ "current font empty" };
 		for(const auto& iter : std::views::iota(utf8_buffer.begin(), utf8_buffer.end())) {
 			float end_offset{ current_font->calc_text_size(std::wstring_view{ utf8_buffer.begin(), std::next(iter) }).x };
-			if(field_region.min.x + end_offset >= input::mouse.pos.x) {
+			if(field_region.min.x + end_offset >= input::mouse.pos.x - pos.x) {
 				float char_size{ current_font->calc_text_size(std::wstring_view{ iter, std::next(iter) }).x };
 				float start_offset{ current_font->calc_text_size(std::wstring_view{ utf8_buffer.begin(), iter }).x };
-				return field_region.min.x + start_offset + char_size / 2 <= input::mouse.pos.x ? std::distance(utf8_buffer.begin(), iter) + 1 : std::distance(utf8_buffer.begin(), iter);
+				return field_region.min.x + start_offset + char_size / 2 <= input::mouse.pos.x - pos.x ? std::distance(utf8_buffer.begin(), iter) + 1 : std::distance(utf8_buffer.begin(), iter);
 			}
 		}
 		return utf8_buffer.length();
 	}
 
-	bool c_text_input::can_hovered() {
+	bool c_text_input::can_hovered() const {
 		if(!i_widget::can_hovered()) return false;
-		return (working_region + pos).contains(input::mouse.pos);
+		return working_region.contains(input::mouse.pos - pos);
 	}
 
-	void c_text_input::setup() {
+	void c_text_input::setup_self() {
 		if(state & e_widget_state::active && write_data.next_change_time <= std::chrono::steady_clock::now())
 			write_data.update(write_data.show ? style.write_pos_hide_duration : style.write_pos_show_duration, !write_data.show);
 		
@@ -36,9 +36,7 @@ namespace null::gui {
 
 		working_region.min = vec2_t{ 0.f, name_size.y + style.field_offset };
 		working_region.max = working_region.min + vec2_t{ size.x, name_size.y + style.input_text_offset.y * 2};
-		bar_region = working_region + pos;
-		field_region = { bar_region.min + style.input_text_offset, bar_region.max - style.input_text_offset };
-		i_widget::setup();
+		field_region = { working_region.min + style.input_text_offset, working_region.max - style.input_text_offset };
 	}
 
 	void c_text_input::draw() {
@@ -47,19 +45,19 @@ namespace null::gui {
 		else if(state & e_widget_state::hovered) field_color = style.hovered_color;
 
 		gui_layer.draw_text(name, pos, { });
-		gui_layer.draw_rect_filled(bar_region, field_color);
+		gui_layer.draw_rect_filled(working_region + pos, field_color);
 
-		gui_layer.push_clip_rect(bar_region, true);
-		gui_layer.draw_text(utf8_buffer, vec2_t{ bar_region.min.x + style.input_text_offset.x, bar_region.origin(rect_t::center).y }, { }, render::e_text_flags::aligin_center_y);
+		gui_layer.push_clip_rect(working_region + pos, true);
+		gui_layer.draw_text(utf8_buffer, vec2_t{ working_region.min.x + style.input_text_offset.x, working_region.origin(rect_t::center).y } + pos, { }, render::e_text_flags::aligin_center_y);
 
 		if(render::c_font* current_font{ render::c_font::get_current_font() }; current_font && state & e_widget_state::active) {
 			if(selection_data.selecting()) {
 				vec2_t start_offset{ current_font->calc_text_size(std::wstring_view{ utf8_buffer.begin(), utf8_buffer.begin() + selection_data.min() }) };
 				vec2_t selected_size{ current_font->calc_text_size(std::wstring_view{ utf8_buffer.begin() + selection_data.min(), utf8_buffer.begin() + selection_data.max() }) };
-				gui_layer.draw_rect_filled(field_region.min + vec2_t{ start_offset.x, 0.f }, field_region.min + start_offset + vec2_t{ selected_size.x, 0.f }, style.selection_rect);
+				gui_layer.draw_rect_filled(field_region.min + vec2_t{ start_offset.x, 0.f } + pos, field_region.min + start_offset + vec2_t{ selected_size.x, 0.f } + pos, style.selection_rect);
 			} else if(write_data.show) {
 				vec2_t write_pos_offset{ current_font->calc_text_size(std::wstring_view{ utf8_buffer.begin(), utf8_buffer.begin() + write_data.offset }) };
-				gui_layer.draw_rect_filled(field_region.min + vec2_t{ write_pos_offset.x - 0.5f, 0.f }, field_region.min + write_pos_offset + vec2_t{ 0.5f, 0.f }, { });
+				gui_layer.draw_rect_filled(field_region.min + vec2_t{ write_pos_offset.x - 0.5f, 0.f } + pos, field_region.min + write_pos_offset + vec2_t{ 0.5f, 0.f } + pos, { });
 			}
 		}
 

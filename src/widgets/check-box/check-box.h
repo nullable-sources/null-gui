@@ -1,8 +1,8 @@
 #pragma once
-#include <widgets/widget.h>
+#include <interfaces/widget/widget.h>
 
 namespace null::gui {
-	class c_check_box : public i_widget {
+	class c_check_box : public interfaces::i_widget {
 	public:
 		struct style_t {
 			color_t<int> default_color{ 50, 50, 50 };
@@ -19,16 +19,15 @@ namespace null::gui {
 		} style;
 
 	public:
-		rect_t box_region{ };
 		bool* value{ };
 
 	public:
-		c_check_box(const std::string_view& _name, bool* _value) : i_widget{ _name }, value{ _value } { }
+		c_check_box(const std::string_view& _name, bool* _value) : interfaces::i_widget{ _name }, value{ _value } { }
 
 	public:
-		virtual bool can_hovered() override;
+		virtual bool can_hovered() const override;
 
-		virtual void setup() override;
+		virtual void setup_self() override;
 		virtual void draw() override;
 
 	public:

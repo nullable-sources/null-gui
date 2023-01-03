@@ -1,8 +1,8 @@
 #pragma once
-#include <widgets/widget.h>
+#include <interfaces/widget/widget.h>
 
 namespace null::gui {
-	class c_button : public i_widget {
+	class c_button : public interfaces::i_widget {
 	public:
 		struct style_t {
 			color_t<int> default_color{ 50, 50, 50 };
@@ -13,10 +13,10 @@ namespace null::gui {
 		} style;
 
 	public:
-		c_button(const std::string_view& _name) : i_widget{ _name } { }
+		c_button(const std::string_view& _name) : interfaces::i_widget{ _name } { }
 
 	public:
-		virtual void setup() override;
+		virtual void setup_self() override;
 		virtual void draw() override;
 	};
 }

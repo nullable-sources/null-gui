@@ -1,8 +1,8 @@
 #pragma once
-#include <widgets/widget.h>
+#include <interfaces/widget/widget.h>
 
 namespace null::gui {
-	class c_scroll_bar : public i_widget {
+	class c_scroll_bar : public interfaces::i_widget {
 	public:
 		struct style_t {
 			color_t<int> background_default_color{ 50, 50, 50 };
@@ -35,13 +35,13 @@ namespace null::gui {
 		} slider_data{ };
 
 	public:
-		c_scroll_bar() : i_widget{ "scroll bar" } { flags |= e_widget_flags::ignore_auto_positioning | e_widget_flags::on_top_layer; }
+		c_scroll_bar() : interfaces::i_widget{ "scroll bar" } { flags |= e_widget_flags::ignore_scroll_offset; }
 
 	public:
 		virtual float get_scroll_value() { return std::min(scroll_value, std::max(max_scroll_value, 0.f)); }
 
 	public:
-		virtual void setup() override;
+		virtual void setup_self() override;
 		virtual void draw() override;
 
 	public:

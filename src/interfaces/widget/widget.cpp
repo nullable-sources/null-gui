@@ -1,7 +1,7 @@
 #include <null-gui.h>
 
-namespace null::gui {
-	std::vector<i_widget*> i_widget::node_t::parent_node() {
+namespace null::gui::interfaces {
+	std::vector<i_widget*> i_widget::node_t::parent_node() const {
 		std::vector<i_widget*> node{ };
 
 		if(parent) {
@@ -12,11 +12,11 @@ namespace null::gui {
 		return node;
 	}
 
-	std::vector<i_widget*> i_widget::node_t::child_node() {
+	std::vector<i_widget*> i_widget::node_t::child_node() const {
 		std::vector<i_widget*> node{ };
 
-		for(std::shared_ptr<i_widget>& child : childs) {
-			auto child_node = child->node.child_node();
+		for(const std::shared_ptr<i_widget>& child : childs) {
+			auto child_node{ child->node.child_node() };
 			node.push_back(child.get());
 			node.insert(node.end(), child_node.begin(), child_node.end());
 		}
@@ -26,31 +26,30 @@ namespace null::gui {
 
 	i_widget* i_widget::add_widget(i_widget* widget) {
 		widget->node.parent = this;
-		widget->setup();
+		setup_child(widget);
 		node.childs.push_back(std::shared_ptr<i_widget>(widget));
 		return node.childs.back().get();
 	}
 
-	void i_widget::setup() {
-		std::ranges::for_each(node.childs | std::views::filter([this](const std::shared_ptr<i_widget>& widget) { return can_handle_child(widget.get()); }), [&](std::shared_ptr<i_widget>& widget) {
-			widget->setup();
+	void i_widget::setup_childs() {
+		std::ranges::for_each(node.childs | std::views::filter([this](const auto& child) { return can_handle_child(child); }), [&](std::shared_ptr<i_widget>& widget) {
+			setup_child(widget.get());
 			});
+	}
+
+	void i_widget::setup() {
+		setup_self();
+		setup_childs();
 	}
 
 	void i_widget::draw() {
 		std::vector<i_widget*> on_top_layer{ };
-		for(std::shared_ptr<i_widget>& widget : node.childs | std::views::filter([this](const std::shared_ptr<i_widget>& widget) { return can_draw_child(widget.get()) && can_handle_child(widget.get()); })) {
+		for(std::shared_ptr<i_widget>& widget : node.childs | std::views::filter([this](const auto& widget) { return can_draw_child(widget) && can_handle_child(widget); })) {
 			if(widget->flags & e_widget_flags::on_top_layer) on_top_layer.push_back(widget.get());
 			else widget->draw();
 		}
 
 		std::ranges::for_each(on_top_layer, [](i_widget* widget) { widget->draw(); });
-	}
-
-	bool i_widget::can_handle_child(i_widget* widget) {
-		if(!(widget->flags & e_widget_flags::visible)) return false;
-		const std::vector<bool>& results{ callbacks.at<e_widget_callbacks::can_handle_child>().call(widget) };
-		return results.empty() ? true : results.front();
 	}
 
 	void i_widget::on_focused() {
@@ -105,10 +104,10 @@ namespace null::gui {
 
 	bool i_widget::handling_child_events(const e_widget_event& event, const std::uintptr_t& w_param, const std::uintptr_t& l_param) {
 		std::vector<i_widget*> bottom_layer_childs{ };
-		for(std::shared_ptr<i_widget>& child_widget : node.childs | std::views::filter([this](const std::shared_ptr<i_widget>& widget) { return can_draw_child(widget.get()) && can_handle_child(widget.get()); })) {
+		for(std::shared_ptr<i_widget>& child_widget : node.childs | std::views::filter([this](const auto& widget) { return can_draw_child(widget) && can_handle_child(widget); })) {
 			if(child_widget->flags & e_widget_flags::on_top_layer) {
 				if(child_widget->event_handling(event, w_param, l_param)) {
-					on_child_event_handled(child_widget.get());
+					on_child_event_handled(event, child_widget.get());
 					return true;
 				}
 			} else bottom_layer_childs.push_back(child_widget.get());
@@ -116,7 +115,7 @@ namespace null::gui {
 
 		for(i_widget* child : bottom_layer_childs) {
 			if(child->event_handling(event, w_param, l_param)) {
-				on_child_event_handled(child);
+				on_child_event_handled(event, child);
 				return true;
 			}
 		}

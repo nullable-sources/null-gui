@@ -60,15 +60,15 @@ namespace null::gui {
 				break;
 		}
 
-		if(i_widget* widget{ i_widget::widgets[e_widget_state::active] ? i_widget::widgets[e_widget_state::active] : i_widget::widgets[e_widget_state::focused] }) {
-			if(std::vector<i_widget*> node{ widget->node.parent_node() }; std::ranges::find_if(node, [](i_widget* parent) { return !(parent->flags & e_widget_flags::visible); }) == node.end()) {
+		if(interfaces::i_widget* widget{ interfaces::i_widget::widgets[e_widget_state::active] ? interfaces::i_widget::widgets[e_widget_state::active] : interfaces::i_widget::widgets[e_widget_state::focused] }) {
+			if(std::vector<interfaces::i_widget*> node{ widget->node.parent_node() }; std::ranges::find_if(node, [](interfaces::i_widget* parent) { return !(parent->flags & e_widget_flags::visible); }) == node.end()) {
 				if(widget->event_handling(widget_msg, w_param, l_param)) {
-					if(widget->node.parent) widget->node.parent->on_child_event_handled(widget);
+					if(widget->node.parent) widget->node.parent->on_child_event_handled(widget_msg, widget);
 					return 1;
 				}
-				for(i_widget* parent : widget->node.parent_node() | std::views::reverse) {
+				for(interfaces::i_widget* parent : widget->node.parent_node() | std::views::reverse) {
 					if(parent->event_handling(widget_msg, w_param, l_param)) {
-						if(parent->node.parent) parent->node.parent->on_child_event_handled(parent);
+						if(parent->node.parent) parent->node.parent->on_child_event_handled(widget_msg, parent);
 						return 1;
 					}
 				}
@@ -82,13 +82,13 @@ namespace null::gui {
 
 		switch(widget_msg) {
 			case e_widget_event::mouse_key_down: {
-				if(i_widget::widgets[e_widget_state::focused])
-					i_widget::widgets[e_widget_state::focused]->on_lost_focus(nullptr);
+				if(interfaces::i_widget::widgets[e_widget_state::focused])
+					interfaces::i_widget::widgets[e_widget_state::focused]->on_lost_focus(nullptr);
 			} break;
 
 			case e_widget_event::mouse_move: {
-				if(i_widget::widgets[e_widget_state::hovered])
-					i_widget::widgets[e_widget_state::hovered]->on_mouse_exit();
+				if(interfaces::i_widget::widgets[e_widget_state::hovered])
+					interfaces::i_widget::widgets[e_widget_state::hovered]->on_mouse_exit();
 			} break;
 		}
 

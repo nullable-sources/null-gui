@@ -1,9 +1,9 @@
 #include <null-gui.h>
 
 namespace null::gui {
-	void c_color_picker::c_sv_box::setup() {
+	void c_color_picker::c_sv_box::setup_self() {
 		size = style.size;
-		i_widget::setup();
+		i_widget::setup_self();
 	}
 
 	void c_color_picker::c_sv_box::draw() {
@@ -28,9 +28,9 @@ namespace null::gui {
 		i_widget::on_mouse_move();
 	}
 
-	void c_color_picker::c_h_bar::setup() {
+	void c_color_picker::c_h_bar::setup_self() {
 		size = { style.thickness, node.parent->working_region.size().y };
-		i_widget::setup();
+		i_widget::setup_self();
 	}
 
 	void c_color_picker::c_h_bar::draw() {
@@ -52,9 +52,9 @@ namespace null::gui {
 		i_widget::on_mouse_move();
 	}
 
-	void c_color_picker::c_alpha_bar::setup() {
+	void c_color_picker::c_alpha_bar::setup_self() {
 		size = { node.parent->working_region.size().x, style.thickness };
-		i_widget::setup();
+		i_widget::setup_self();
 	}
 
 	void c_color_picker::c_alpha_bar::draw() {
@@ -71,18 +71,17 @@ namespace null::gui {
 		i_widget::on_mouse_move();
 	}
 
-	bool c_color_picker::can_hovered() {
+	bool c_color_picker::can_hovered() const {
 		if(!i_widget::can_hovered()) return false;
-		return box_region.contains(input::mouse.pos);
+		return working_region.contains(input::mouse.pos - pos);
 	}
 
-	void c_color_picker::setup() {
+	void c_color_picker::setup_self() {
 		size = render::c_font::get_current_font()->calc_text_size(name) + vec2_t{ style.text_offset + style.box_size.x, 0.f };
 		size = math::max(size, vec2_t{ node.parent->working_region.size().x, style.box_size.y });
 
 		working_region = rect_t{ vec2_t{ 0.f }, style.box_size };
-		box_region = working_region + pos;
-		i_widget::setup();
+		i_widget::setup_self();
 	}
 
 	void c_color_picker::draw() {
@@ -90,15 +89,15 @@ namespace null::gui {
 		if(state & e_widget_state::active) field_color = style.active_color;
 		else if(state & e_widget_state::hovered) field_color = style.hovered_color;
 
-		gui_layer.draw_text(name, box_region.origin(rect_t::center) + vec2_t{ box_region.size().x / 2.f + style.text_offset, 0.f }, style.text_color, render::e_text_flags::aligin_center_y);
-		gui_layer.draw_rect_filled(box_region, *color);
+		gui_layer.draw_text(name, working_region.origin(rect_t::center) + vec2_t{ working_region.size().x / 2.f + style.text_offset, 0.f } + pos, style.text_color, render::e_text_flags::aligin_center_y);
+		gui_layer.draw_rect_filled(working_region + pos, *color);
 
 		i_widget::draw();
 	}
 
-	void c_color_picker::on_child_in_node_event_handled(i_widget* child) {
+	void c_color_picker::on_child_in_node_event_handled(const e_widget_event& event, i_widget* child) {
 		*color = color_t<int>{ hsv };
-		i_widget::on_child_in_node_event_handled(child);
+		i_widget::on_child_in_node_event_handled(event, child);
 	}
 
 	void c_color_picker::on_mouse_key_up(const input::e_key_id& key) {

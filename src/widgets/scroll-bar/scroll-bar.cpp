@@ -1,20 +1,12 @@
 #include <null-gui.h>
 
 namespace null::gui {
-	void c_scroll_bar::setup() {
-		if(max_scroll_value <= 0.f) return;
-
-		pos = vec2_t{ node.parent->pos.x + node.parent->size.x - style.container_padding.x - style.bar_size, node.parent->pos.y + node.parent->working_region.min.y + style.container_padding.y };
+	void c_scroll_bar::setup_self() {
 		size = vec2_t{ style.bar_size, node.parent->working_region.size().y - style.container_padding.y * 2 };
 
 		pixel_per_scroll = size.y / (size.y + max_scroll_value);
-		slider_data.pos = pos + vec2_t{ 0.f, pixel_per_scroll * get_scroll_value() };
+		slider_data.pos = vec2_t{ 0.f, pixel_per_scroll * get_scroll_value() };
 		slider_data.size = { size.x, std::max(size.y * pixel_per_scroll, 4.f) };
-
-		//@todo: rewrite this trash after implementing layouts
-		node.parent->working_region.max.x -= (node.parent->pos.x + node.parent->size.x) - pos.x + style.container_working_rect_padding;
-
-		i_widget::setup();
 	}
 
 	void c_scroll_bar::draw() {
@@ -25,7 +17,7 @@ namespace null::gui {
 		else if(state & e_widget_state::hovered) background_color = style.background_hovered_color;
 
 		gui_layer.draw_rect_filled(pos, pos + size, background_color);
-		gui_layer.draw_rect_filled(slider_data.pos, slider_data.pos + slider_data.size, { style.slider_default_color });
+		gui_layer.draw_rect_filled(pos + slider_data.pos, pos +slider_data.pos + slider_data.size, { style.slider_default_color });
 		i_widget::draw();
 	}
 
